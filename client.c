@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
     atomic_store(&C.mode, MODE_INTERACTIVE);
     atomic_store(&C.have_welcome, 0);
 
-    C.win_w = 900; C.win_h = 700;
+    C.win_w = 1800; C.win_h = 1400;
 
     SDL_Window *win = SDL_CreateWindow("Random Walk Client (Phase A)",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, C.win_w, C.win_h, SDL_WINDOW_SHOWN);
@@ -244,9 +244,40 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    int rw, rh;
+    SDL_GetRendererOutputSize(ren, &rw, &rh);
+    C.win_w = rw;
+    C.win_h = rh;
+
+
+    SDL_Texture *canvas = SDL_CreateTexture(
+        ren,
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        C.win_w,
+        C.win_h
+    );
+
+    if (!canvas) {
+        fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
+        SDL_DestroyRenderer(ren);
+        SDL_DestroyWindow(win);
+        SDL_Quit();
+        close(fd);
+        return 1;
+    }
+
+    SDL_SetTextureBlendMode(canvas, SDL_BLENDMODE_BLEND);
+
+
+    //SDL_RenderSetLogicalSize(ren, C.win_w, C.win_h);
+
+    SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
+    SDL_SetRenderTarget(ren, canvas);
     SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
     SDL_RenderClear(ren);
-    SDL_RenderPresent(ren);
+    SDL_SetRenderTarget(ren, NULL);
+
 
     pthread_t th;
     pthread_create(&th, NULL, net_thread, &C);
@@ -263,10 +294,11 @@ int main(int argc, char **argv) {
                 if (e.key.keysym.sym == SDLK_i) send_mode(C.sockfd, MODE_INTERACTIVE);
                 if (e.key.keysym.sym == SDLK_s) send_mode(C.sockfd, MODE_SUMMARY);
                 if (e.key.keysym.sym == SDLK_c) {
-                    // clear screen
+                    SDL_SetRenderTarget(ren, canvas);
                     SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
                     SDL_RenderClear(ren);
-                    SDL_RenderPresent(ren);
+                    SDL_SetRenderTarget(ren, NULL);
+
                     last_drawn_step = 0;
                 }
                 if (e.key.keysym.sym == SDLK_q) {
@@ -300,7 +332,9 @@ int main(int argc, char **argv) {
                 world_to_screen(&C, px, py, &x1, &y1);
                 world_to_screen(&C, x,  y,  &x2, &y2);
 
-                if (abs(px-x)==1 || abs(py-y)==1){
+                SDL_SetRenderTarget(ren, canvas);
+
+                if ((px == x && abs(py - y) == 1) || (py == y && abs(px - x) == 1)){
                     SDL_SetRenderDrawColor(ren, 230, 230, 240, 255);
                     SDL_RenderDrawLine(ren, x1, y1, x2, y2);
                 }
@@ -308,10 +342,17 @@ int main(int argc, char **argv) {
                 SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
                 SDL_RenderDrawPoint(ren, x2, y2);
 
-                SDL_RenderPresent(ren);
+                SDL_SetRenderTarget(ren, NULL);
                 last_drawn_step = si;
             }
         }
+
+        SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
+        SDL_RenderClear(ren);
+
+        SDL_RenderCopy(ren, canvas, NULL, NULL);
+
+        SDL_RenderPresent(ren);
 
         SDL_Delay(5);
     }
@@ -320,6 +361,7 @@ int main(int argc, char **argv) {
     shutdown(fd, SHUT_RDWR);
     pthread_join(th, NULL);
 
+    SDL_DestroyTexture(canvas);
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
