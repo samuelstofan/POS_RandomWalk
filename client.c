@@ -15,6 +15,9 @@
 #include "shared.h"
 #include <math.h>
 
+#define STEP_FIFO_CAP 4096
+
+
 static int send_all(int fd, const void *buf, size_t n) {
     const uint8_t *p = (const uint8_t*)buf;
     while (n) {
@@ -59,6 +62,19 @@ static int connect_unix(const char *path) {
 }
 
 typedef struct {
+    int x, y;
+    uint32_t step_index;
+} Step;
+
+typedef struct {
+    Step buf[STEP_FIFO_CAP];
+    int head;   // zapis
+    int tail;   // citanie
+    int count;
+    pthread_mutex_t mtx;
+} StepFIFO;
+
+typedef struct {
     int sockfd;
 
     atomic_int running;
@@ -78,6 +94,8 @@ typedef struct {
 
     // renderer scaling
     int win_w, win_h;
+
+    StepFIFO fifo;
 } ClientState;
 
 
@@ -88,7 +106,50 @@ static void world_to_screen(const ClientState *S, int wx, int wy, int *sx, int *
     *sy = (int)((double)wy * (S->win_h - 1) / (double)(S->world_h - 1));
 }
 
+static void draw_big_point(SDL_Renderer *ren, int x, int y, int r)
+{
+    SDL_Rect rect = {
+        x - r,
+        y - r,
+        2*r + 1,
+        2*r + 1
+    };
+    SDL_RenderFillRect(ren, &rect);
+}
 
+static void fifo_push(StepFIFO *f, Step s)
+{
+    pthread_mutex_lock(&f->mtx);
+
+    if (f->count == STEP_FIFO_CAP) {
+        // zahod najstarsi krok
+        f->tail = (f->tail + 1) % STEP_FIFO_CAP;
+        f->count--;
+    }
+
+    f->buf[f->head] = s;
+    f->head = (f->head + 1) % STEP_FIFO_CAP;
+    f->count++;
+
+    pthread_mutex_unlock(&f->mtx);
+}
+
+static int fifo_pop(StepFIFO *f, Step *out)
+{
+    pthread_mutex_lock(&f->mtx);
+
+    if (f->count == 0) {
+        pthread_mutex_unlock(&f->mtx);
+        return 0;
+    }
+
+    *out = f->buf[f->tail];
+    f->tail = (f->tail + 1) % STEP_FIFO_CAP;
+    f->count--;
+
+    pthread_mutex_unlock(&f->mtx);
+    return 1;
+}
 
 
 static void *net_thread(void *arg) {
@@ -120,17 +181,13 @@ static void *net_thread(void *arg) {
             pthread_mutex_unlock(&C->pos_mtx);
         } else if (h.type == MSG_STEP && h.len == sizeof(MsgStep)) {
             MsgStep *s = (MsgStep*)payload;
-            pthread_mutex_lock(&C->pos_mtx);
-            if (!C->have_pos) {
-                C->prev_x = s->x; C->prev_y = s->y;
-                C->x = s->x; C->y = s->y;
-                C->have_pos = 1;
-            } else {
-                C->prev_x = C->x; C->prev_y = C->y;
-                C->x = s->x; C->y = s->y;
-            }
-            C->step_index = s->step_index;
-            pthread_mutex_unlock(&C->pos_mtx);
+
+            Step st;
+            st.x = s->x;
+            st.y = s->y;
+            st.step_index = s->step_index;
+
+            fifo_push(&C->fifo, st);
         } else if (h.type == MSG_MODE && h.len == sizeof(MsgMode)) {
             MsgMode *m = (MsgMode*)payload;
             atomic_store(&C->mode, m->mode);
@@ -218,6 +275,8 @@ int main(int argc, char **argv) {
 
     ClientState C;
     memset(&C, 0, sizeof(C));
+    pthread_mutex_init(&C.fifo.mtx, NULL);
+    C.fifo.head = C.fifo.tail = C.fifo.count = 0;
     C.sockfd = fd;
     atomic_store(&C.running, 1);
     pthread_mutex_init(&C.pos_mtx, NULL);
@@ -283,7 +342,10 @@ int main(int argc, char **argv) {
     pthread_create(&th, NULL, net_thread, &C);
 
     int running = 1;
-    uint32_t last_drawn_step = UINT32_MAX;
+    int start_point_drawn = 0;
+
+    static int have_prev = 0;
+    static int prev_x = 0, prev_y = 0;
 
     while (running && atomic_load(&C.running)) {
         SDL_Event e;
@@ -299,7 +361,9 @@ int main(int argc, char **argv) {
                     SDL_RenderClear(ren);
                     SDL_SetRenderTarget(ren, NULL);
 
-                    last_drawn_step = 0;
+                    have_prev = 0;
+                    start_point_drawn = 0;
+
                 }
                 if (e.key.keysym.sym == SDLK_q) {
                     send_stop(C.sockfd);
@@ -316,35 +380,43 @@ int main(int argc, char **argv) {
         uint32_t mode_now = atomic_load(&C.mode);
 
         if (mode_now == MODE_INTERACTIVE) {
-            int have;
-            int x,y,px,py;
-            uint32_t si;
+            
+            Step st;
+            SDL_SetRenderTarget(ren, canvas);
 
-            pthread_mutex_lock(&C.pos_mtx);
-            have = C.have_pos;
-            x = C.x; y = C.y;
-            px = C.prev_x; py = C.prev_y;
-            si = C.step_index;
-            pthread_mutex_unlock(&C.pos_mtx);
+            while (fifo_pop(&C.fifo, &st)) {
 
-            if (have && si != last_drawn_step) {
-                int x1,y1,x2,y2;
-                world_to_screen(&C, px, py, &x1, &y1);
-                world_to_screen(&C, x,  y,  &x2, &y2);
+                if (!have_prev) {
+                    prev_x = st.x;
+                    prev_y = st.y;
+                    have_prev = 1;
+                    if (!start_point_drawn) {
+                        int sx, sy;
+                        world_to_screen(&C, prev_x, prev_y, &sx, &sy);
 
-                SDL_SetRenderTarget(ren, canvas);
+                        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+                        draw_big_point(ren, sx, sy, 4);
 
-                if ((px == x && abs(py - y) == 1) || (py == y && abs(px - x) == 1)){
+                        start_point_drawn = 1;
+                    }
+                    continue;
+                }
+
+
+                int x1, y1, x2, y2;
+                world_to_screen(&C, prev_x, prev_y, &x1, &y1);
+                world_to_screen(&C, st.x,   st.y,   &x2, &y2);
+
+                if (abs(prev_x - st.x) == 1|| abs(prev_y - st.y) == 1) {
                     SDL_SetRenderDrawColor(ren, 230, 230, 240, 255);
                     SDL_RenderDrawLine(ren, x1, y1, x2, y2);
                 }
 
-                SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
-                SDL_RenderDrawPoint(ren, x2, y2);
-
-                SDL_SetRenderTarget(ren, NULL);
-                last_drawn_step = si;
+                prev_x = st.x;
+                prev_y = st.y;
             }
+
+            SDL_SetRenderTarget(ren, NULL);
         }
 
         SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
@@ -352,19 +424,15 @@ int main(int argc, char **argv) {
 
         SDL_RenderCopy(ren, canvas, NULL, NULL);
 
+        if (have_prev) {
+            int sx, sy;
+            world_to_screen(&C, prev_x, prev_y, &sx, &sy);
+
+            SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
+            draw_big_point(ren, sx, sy, 4);
+        }
+
         SDL_RenderPresent(ren);
-
-        SDL_Delay(5);
+        SDL_Delay(45);
     }
-
-    atomic_store(&C.running, 0);
-    shutdown(fd, SHUT_RDWR);
-    pthread_join(th, NULL);
-
-    SDL_DestroyTexture(canvas);
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-    SDL_Quit();
-    close(fd);
-    return 0;
 }

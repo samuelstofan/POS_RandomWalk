@@ -158,7 +158,6 @@ static void *client_reader_thread(void *arg) {
         }
     }
 
-    // remove from list
     pthread_mutex_lock(&S->clients_mtx);
     Client **pp = &S->clients;
     while (*pp) {
@@ -186,7 +185,6 @@ static void *accept_thread(void *arg) {
             break;
         }
 
-        // create client and send initial state before joining broadcasts
         Client *c = (Client*)calloc(1, sizeof(Client));
         c->fd = cfd;
 
@@ -203,7 +201,6 @@ static void *accept_thread(void *arg) {
             pthread_create(&S->sim_th, NULL, sim_thread, S);
         }
 
-        // per-client reader thread
         pthread_t th;
         struct { Server *S; int fd; } *ctx = malloc(sizeof(*ctx));
         ctx->S = S; ctx->fd = cfd;
