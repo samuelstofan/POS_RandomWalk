@@ -44,7 +44,6 @@ static void send_stop(int sockfd) {
     send_all(sockfd, &h, sizeof(h));
 }
 
-
 static int connect_unix(const char *path) {
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) return -1;
@@ -98,8 +97,6 @@ typedef struct {
     StepFIFO fifo;
 } ClientState;
 
-
-
 static void world_to_screen(const ClientState *S, int wx, int wy, int *sx, int *sy)
 {
     *sx = (int)((double)wx * (S->win_w - 1) / (double)(S->world_w - 1));
@@ -150,7 +147,6 @@ static int fifo_pop(StepFIFO *f, Step *out)
     pthread_mutex_unlock(&f->mtx);
     return 1;
 }
-
 
 static void *net_thread(void *arg) {
     ClientState *C = (ClientState*)arg;
@@ -355,12 +351,12 @@ int main(int argc, char **argv) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)  {
-                send_stop(C.sockfd);    
+                //send_stop(C.sockfd);    
                 running = 0;
             }
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
-                    send_stop(C.sockfd);
+                    //send_stop(C.sockfd);
                     running = 0;
                 }
                 if (e.key.keysym.sym == SDLK_i) send_mode(C.sockfd, MODE_INTERACTIVE);
@@ -460,4 +456,14 @@ int main(int argc, char **argv) {
         SDL_RenderPresent(ren);
         SDL_Delay(1000/60);
     }
+
+    atomic_store(&C.running, 0);
+    shutdown(C.sockfd, SHUT_RDWR);
+    close(C.sockfd);
+    pthread_join(th, NULL);
+    SDL_DestroyTexture(canvas);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
+    SDL_Quit();
+    return 0;
 }

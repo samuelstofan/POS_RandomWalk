@@ -79,6 +79,7 @@ typedef struct {
     atomic_int running;
     atomic_int sim_started;
     atomic_int waiting_before_shutdown;
+    atomic_int active_clients;
     pthread_t accept_th, sim_th;
 } Server;
 
@@ -93,6 +94,7 @@ static void clients_broadcast(Server *S, uint32_t type, const void *payload, uin
             close(c->fd);
             *pp = c->next;
             free(c);
+            atomic_fetch_sub(&S->active_clients, 1);
             continue;
         }
         pp = &(*pp)->next;
@@ -174,6 +176,7 @@ static void *client_reader_thread(void *arg) {
             *pp = victim->next;
             close(victim->fd);
             free(victim);
+            atomic_fetch_sub(&S->active_clients, 1);
             break;
         }
         pp = &(*pp)->next;
@@ -203,6 +206,7 @@ static void *accept_thread(void *arg) {
         c->next = S->clients;
         S->clients = c;
         pthread_mutex_unlock(&S->clients_mtx);
+        atomic_fetch_add(&S->active_clients, 1);
 
         int expected = 0;
         if (atomic_compare_exchange_strong(&S->sim_started, &expected, 1)) {
@@ -377,7 +381,8 @@ int main(int argc, char **argv) {
     atomic_store(&S.current_step, 0);
     atomic_store(&S.running, 1);
     atomic_store(&S.sim_started, 0);
-    atomic_store(&S.waiting_before_shutdown, 1);
+    atomic_store(&S.waiting_before_shutdown, 0);
+    atomic_store(&S.active_clients, 0);
 
     signal(SIGINT, on_sigint);
     signal(SIGTERM, on_sigint);
@@ -395,9 +400,10 @@ int main(int argc, char **argv) {
 
     while (!g_stop && atomic_load(&S.running)) {
         sleep(1);
+        atomic_store(&S.waiting_before_shutdown, 1);
     }
 
-    while (atomic_load(&S.waiting_before_shutdown)) {
+    while (atomic_load(&S.active_clients) > 0) {
         sleep(1);
     }
     atomic_store(&S.running, 0);
