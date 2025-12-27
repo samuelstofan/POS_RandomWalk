@@ -206,21 +206,23 @@ static void send_mode(int sockfd, uint32_t mode) {
 }
 
 static int spawn_server(const char *server_path, const char *sock_path,
-                        int world_w, int world_h, int delay_ms,
+                        int world_w, int world_h, int delay_ms, int replications, int max_steps,
                         float pU, float pD, float pL, float pR) {
     pid_t pid = fork();
     if (pid < 0) return -1;
     if (pid == 0) {
-        char wbuf[32], hbuf[32], dbuf[32], pu[32], pd[32], pl[32], pr[32];
+        char wbuf[32], hbuf[32], dbuf[32],rbuf[32], kbuf[32], pu[32], pd[32], pl[32], pr[32];
         snprintf(wbuf, sizeof(wbuf), "%d", world_w);
         snprintf(hbuf, sizeof(hbuf), "%d", world_h);
         snprintf(dbuf, sizeof(dbuf), "%d", delay_ms);
+        snprintf(rbuf, sizeof(rbuf), "%d", replications);
+        snprintf(kbuf, sizeof(kbuf), "%d", max_steps);
         snprintf(pu, sizeof(pu), "%.6f", pU);
         snprintf(pd, sizeof(pd), "%.6f", pD);
         snprintf(pl, sizeof(pl), "%.6f", pL);
         snprintf(pr, sizeof(pr), "%.6f", pR);
 
-        execl(server_path, server_path, sock_path, wbuf, hbuf, dbuf, pu, pd, pl, pr, (char*)NULL);
+        execl(server_path, server_path, sock_path, wbuf, hbuf, dbuf, rbuf, kbuf, pu, pd, pl, pr, (char*)NULL);
         perror("execl server");
         _exit(127);
     }
@@ -249,10 +251,15 @@ int main(int argc, char **argv) {
 
     int world_w = 101, world_h = 101;
     int delay_ms = 10;
+    int replications = 5;
+    int max_steps    = 100;    
     float pU=0.25f, pD=0.25f, pL=0.25f, pR=0.25f;
 
+    uint32_t last_step_index = 0;
+
+
     if (strcmp(mode, "--new") == 0) {
-        if (spawn_server(server_bin, sock_path, world_w, world_h, delay_ms, pU, pD, pL, pR) != 0) {
+        if (spawn_server(server_bin, sock_path, world_w, world_h, delay_ms, replications, max_steps, pU, pD, pL, pR) != 0) {
             perror("spawn_server");
             return 1;
         }
@@ -328,15 +335,11 @@ int main(int argc, char **argv) {
 
     SDL_SetTextureBlendMode(canvas, SDL_BLENDMODE_BLEND);
 
-
-    //SDL_RenderSetLogicalSize(ren, C.win_w, C.win_h);
-
     SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
     SDL_SetRenderTarget(ren, canvas);
     SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
     SDL_RenderClear(ren);
     SDL_SetRenderTarget(ren, NULL);
-
 
     pthread_t th;
     pthread_create(&th, NULL, net_thread, &C);
@@ -346,6 +349,7 @@ int main(int argc, char **argv) {
 
     static int have_prev = 0;
     static int prev_x = 0, prev_y = 0;
+
 
     while (running && atomic_load(&C.running)) {
         SDL_Event e;
@@ -378,13 +382,24 @@ int main(int argc, char **argv) {
         }
 
         uint32_t mode_now = atomic_load(&C.mode);
-
+        
         if (mode_now == MODE_INTERACTIVE) {
             
             Step st;
             SDL_SetRenderTarget(ren, canvas);
 
             while (fifo_pop(&C.fifo, &st)) {
+                if (st.step_index == 0 || st.step_index < last_step_index) {
+                    SDL_SetRenderTarget(ren, canvas);
+                    SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
+                    SDL_RenderClear(ren);
+                    SDL_SetRenderTarget(ren, NULL);
+                    have_prev = 0;
+                    start_point_drawn = 0;
+                }
+                last_step_index = st.step_index;
+
+                //printf("Step %u: (%d, %d)\n", st.step_index, st.x, st.y);
 
                 if (!have_prev) {
                     prev_x = st.x;
@@ -394,6 +409,7 @@ int main(int argc, char **argv) {
                         int sx, sy;
                         world_to_screen(&C, prev_x, prev_y, &sx, &sy);
 
+                        SDL_SetRenderTarget(ren, canvas);
                         SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
                         draw_big_point(ren, sx, sy, 4);
 
@@ -417,6 +433,9 @@ int main(int argc, char **argv) {
             }
 
             SDL_SetRenderTarget(ren, NULL);
+        } else if (mode_now == MODE_SUMMARY) {
+            SDL_SetRenderDrawColor(ren, 40, 40, 60, 255);
+            SDL_RenderClear(ren);
         }
 
         SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
@@ -429,10 +448,10 @@ int main(int argc, char **argv) {
             world_to_screen(&C, prev_x, prev_y, &sx, &sy);
 
             SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
-            draw_big_point(ren, sx, sy, 4);
+            draw_big_point(ren, sx, sy, 2);
         }
 
         SDL_RenderPresent(ren);
-        SDL_Delay(45);
+        SDL_Delay(1000/60);
     }
 }

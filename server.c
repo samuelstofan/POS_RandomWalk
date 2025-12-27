@@ -44,8 +44,6 @@ static int recv_all(int fd, void *buf, size_t n) {
     return 1;
 }
 
-
-
 static float get_random(void) { return (float)rand() / (float)RAND_MAX; }
 
 static void *sim_thread(void *arg);
@@ -59,10 +57,16 @@ typedef struct {
     // config
     int world_w, world_h;
     int step_delay_ms;
+    int replications;
+    int max_steps;
     float pU, pD, pL, pR;
+    //ulozenie do suboru TODO
 
     // state
-    atomic_uint mode; // SimMode
+    atomic_uint mode;
+
+    atomic_int current_replication;
+    atomic_int current_step;
 
     // clients
     pthread_mutex_t clients_mtx;
@@ -99,8 +103,10 @@ static void send_welcome(Server *S, int fd) {
     MsgWelcome w = {
         .world_w = (uint32_t)S->world_w,
         .world_h = (uint32_t)S->world_h,
-        .mode = atomic_load(&S->mode),
         .step_delay_ms = (uint32_t)S->step_delay_ms,
+        .replications = (uint32_t)S->replications,
+        .max_steps = (uint32_t)S->max_steps,
+        .mode = atomic_load(&S->mode),
         .pU = S->pU, .pD = S->pD, .pL = S->pL, .pR = S->pR
     };
     MsgHdr h = { MSG_WELCOME, (uint32_t)sizeof(w) };
@@ -210,7 +216,7 @@ static void *accept_thread(void *arg) {
     return NULL;
 }
 
-static void *sim_thread(void *arg) {
+/*static void *sim_thread(void *arg) {
     Server *S = (Server*)arg;
 
     int x = S->world_w / 2;
@@ -237,7 +243,62 @@ static void *sim_thread(void *arg) {
         usleep((useconds_t)S->step_delay_ms * 1000u);
     }
     return NULL;
+}*/
+static void *sim_thread(void *arg) {
+    Server *S = (Server*)arg;
+
+    int center_x = S->world_w / 2;
+    int center_y = S->world_h / 2;
+
+    for (int rep = 0; rep < S->replications && atomic_load(&S->running); rep++) {
+
+        atomic_store(&S->current_replication, rep);
+        atomic_store(&S->current_step, 0);
+
+        int x = center_x;
+        int y = center_y;
+
+        MsgStep st0 = { .x = x, .y = y, .step_index = 0 };
+        clients_broadcast(S, MSG_STEP, &st0, sizeof(st0));
+
+        for (int step = 0;
+             step < S->max_steps && atomic_load(&S->running);
+             step++) {
+
+            float r = get_random();
+            int dx = 0, dy = 0;
+
+            if (r < S->pU) dy = -1;
+            else if (r < S->pU + S->pD) dy = +1;
+            else if (r < S->pU + S->pD + S->pL) dx = -1;
+            else dx = +1;
+
+            x = (x + dx) % S->world_w;
+            y = (y + dy) % S->world_h;
+            if (x < 0) x += S->world_w;
+            if (y < 0) y += S->world_h;
+
+            atomic_store(&S->current_step, step + 1);
+
+            MsgStep st = {
+                .x = x,
+                .y = y,
+                .step_index = step + 1
+            };
+            clients_broadcast(S, MSG_STEP, &st, sizeof(st));
+
+            usleep((useconds_t)S->step_delay_ms * 1000u);
+        }
+    }
+
+    MsgMode m = { .mode = MODE_SUMMARY };
+    atomic_store(&S->mode, MODE_SUMMARY);
+    clients_broadcast(S, MSG_MODE, &m, sizeof(m));
+
+    atomic_store(&S->running, 0);
+    return NULL;
 }
+
 
 static int make_listen_socket(Server *S) {
     S->listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -257,10 +318,10 @@ static int make_listen_socket(Server *S) {
 static void on_sigint(int sig) { (void)sig; g_stop = 1; }
 
 int main(int argc, char **argv) {
-    if (argc < 9) {
+    if (argc < 11) {
         fprintf(stderr,
-            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <pU> <pD> <pL> <pR>\n"
-            "Example: %s /tmp/rwalk.sock 101 101 10 0.25 0.25 0.25 0.25\n",
+            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR>\n"
+            "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25\n",
             argv[0], argv[0]);
         return 2;
     }
@@ -275,18 +336,27 @@ int main(int argc, char **argv) {
     S.world_w = atoi(argv[2]);
     S.world_h = atoi(argv[3]);
     S.step_delay_ms = atoi(argv[4]);
-    S.pU = strtof(argv[5], NULL);
-    S.pD = strtof(argv[6], NULL);
-    S.pL = strtof(argv[7], NULL);
-    S.pR = strtof(argv[8], NULL);
+    S.replications = atoi(argv[5]);     // pridaj do usage!
+    S.max_steps    = atoi(argv[6]);
+    S.pU = strtof(argv[7], NULL);
+    S.pD = strtof(argv[8], NULL);
+    S.pL = strtof(argv[9], NULL);
+    S.pR = strtof(argv[10], NULL);
 
     float psum = S.pU + S.pD + S.pL + S.pR;
     if (S.world_w <= 2 || S.world_h <= 2 || S.step_delay_ms < 0 || (psum < 0.999f || psum > 1.001f)) {
         fprintf(stderr, "Invalid args (world sizes >2, delay>=0, probabilities sum ~ 1).\n");
         return 2;
     }
+    if (S.replications <= 0 || S.max_steps <= 0) {
+        fprintf(stderr, "replications and max_steps must be > 0\n");
+        return 2;
+    }
+
 
     atomic_store(&S.mode, MODE_INTERACTIVE);
+    atomic_store(&S.current_replication, 0);
+    atomic_store(&S.current_step, 0);
     atomic_store(&S.running, 1);
     atomic_store(&S.sim_started, 0);
 
