@@ -60,7 +60,7 @@ typedef struct {
     int replications;
     int max_steps;
     float pU, pD, pL, pR;
-    //ulozenie do suboru TODO
+    FILE *results_fp;
 
     // state
     atomic_uint mode;
@@ -289,6 +289,12 @@ static void *sim_thread(void *arg) {
 
             usleep((useconds_t)S->step_delay_ms * 1000u);
         }
+
+        if (S->results_fp) {
+            int manhattan = abs(x - center_x) + abs(y - center_y);
+            fprintf(S->results_fp, "%d,%d\n", rep, manhattan);
+            fflush(S->results_fp);
+        }
     }
 
     MsgMode m = { .mode = MODE_SUMMARY };
@@ -336,20 +342,30 @@ int main(int argc, char **argv) {
     S.world_w = atoi(argv[2]);
     S.world_h = atoi(argv[3]);
     S.step_delay_ms = atoi(argv[4]);
-    S.replications = atoi(argv[5]);     // pridaj do usage!
+    S.replications = atoi(argv[5]);    
     S.max_steps    = atoi(argv[6]);
     S.pU = strtof(argv[7], NULL);
     S.pD = strtof(argv[8], NULL);
     S.pL = strtof(argv[9], NULL);
     S.pR = strtof(argv[10], NULL);
 
+    S.results_fp = fopen("replication_results.csv", "w");
+    if (!S.results_fp) {
+        perror("replication_results.csv");
+        return 1;
+    }
+    fprintf(S.results_fp, "replication,manhattan_distance\n");
+    fflush(S.results_fp);
+
     float psum = S.pU + S.pD + S.pL + S.pR;
     if (S.world_w <= 2 || S.world_h <= 2 || S.step_delay_ms < 0 || (psum < 0.999f || psum > 1.001f)) {
         fprintf(stderr, "Invalid args (world sizes >2, delay>=0, probabilities sum ~ 1).\n");
+        fclose(S.results_fp);
         return 2;
     }
     if (S.replications <= 0 || S.max_steps <= 0) {
         fprintf(stderr, "replications and max_steps must be > 0\n");
+        fclose(S.results_fp);
         return 2;
     }
 
@@ -365,6 +381,7 @@ int main(int argc, char **argv) {
 
     if (make_listen_socket(&S) != 0) {
         perror("server socket");
+        fclose(S.results_fp);
         return 1;
     }
 
@@ -378,11 +395,13 @@ int main(int argc, char **argv) {
     }
 
     atomic_store(&S.running, 0);
+    shutdown(S.listen_fd, SHUT_RDWR);
     pthread_join(S.accept_th, NULL);
     if (atomic_load(&S.sim_started)) {
         pthread_join(S.sim_th, NULL);
     }
     close(S.listen_fd);
     unlink(S.sock_path);
+    fclose(S.results_fp);
     return 0;
 }
