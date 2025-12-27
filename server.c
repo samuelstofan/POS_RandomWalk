@@ -78,6 +78,7 @@ typedef struct {
 
     atomic_int running;
     atomic_int sim_started;
+    atomic_int waiting_before_shutdown;
     pthread_t accept_th, sim_th;
 } Server;
 
@@ -149,9 +150,10 @@ static void *client_reader_thread(void *arg) {
         if (h.type == MSG_STOP && h.len == 0) {
             fprintf(stderr, "Server: STOP received\n");
             atomic_store(&S->running, 0);
-            close(S->listen_fd);
-            unlink(S->sock_path);
-            g_stop = 1;
+            atomic_store(&S->waiting_before_shutdown, 0);
+            //close(S->listen_fd);
+            //unlink(S->sock_path);
+            //g_stop = 1;
             break;
         }
 
@@ -375,6 +377,7 @@ int main(int argc, char **argv) {
     atomic_store(&S.current_step, 0);
     atomic_store(&S.running, 1);
     atomic_store(&S.sim_started, 0);
+    atomic_store(&S.waiting_before_shutdown, 1);
 
     signal(SIGINT, on_sigint);
     signal(SIGTERM, on_sigint);
@@ -394,6 +397,9 @@ int main(int argc, char **argv) {
         sleep(1);
     }
 
+    while (atomic_load(&S.waiting_before_shutdown)) {
+        sleep(1);
+    }
     atomic_store(&S.running, 0);
     shutdown(S.listen_fd, SHUT_RDWR);
     pthread_join(S.accept_th, NULL);
@@ -403,5 +409,7 @@ int main(int argc, char **argv) {
     close(S.listen_fd);
     unlink(S.sock_path);
     fclose(S.results_fp);
+    fprintf(stdout, "SERVER SHUTDOWN\n");
+    fflush(stdout);
     return 0;
 }

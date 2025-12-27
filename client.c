@@ -354,9 +354,15 @@ int main(int argc, char **argv) {
     while (running && atomic_load(&C.running)) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) running = 0;
+            if (e.type == SDL_QUIT)  {
+                send_stop(C.sockfd);    
+                running = 0;
+            }
             if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_ESCAPE) running = 0;
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    send_stop(C.sockfd);
+                    running = 0;
+                }
                 if (e.key.keysym.sym == SDLK_i) send_mode(C.sockfd, MODE_INTERACTIVE);
                 if (e.key.keysym.sym == SDLK_s) send_mode(C.sockfd, MODE_SUMMARY);
                 if (e.key.keysym.sym == SDLK_c) {
