@@ -434,24 +434,24 @@ int main(int argc, char **argv) {
             }
 
             SDL_SetRenderTarget(ren, NULL);
+            SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
+            SDL_RenderClear(ren);
+
+            SDL_RenderCopy(ren, canvas, NULL, NULL);
+
+            if (have_prev) {
+                int sx, sy;
+                world_to_screen(&C, prev_x, prev_y, &sx, &sy);
+
+                SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
+                draw_big_point(ren, sx, sy, 2);
+            }
+
+            SDL_RenderPresent(ren);
         } else if (mode_now == MODE_SUMMARY) {
-            
         }
 
-        SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);
-        SDL_RenderClear(ren);
-
-        SDL_RenderCopy(ren, canvas, NULL, NULL);
-
-        if (have_prev) {
-            int sx, sy;
-            world_to_screen(&C, prev_x, prev_y, &sx, &sy);
-
-            SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
-            draw_big_point(ren, sx, sy, 2);
-        }
-
-        SDL_RenderPresent(ren);
+        
         SDL_Delay(1000/60);
     }
 

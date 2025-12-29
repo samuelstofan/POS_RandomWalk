@@ -269,7 +269,7 @@ static void *sim_thread(void *arg) {
             for (int y_spawn = 0; y_spawn < S->world_h && atomic_load(&S->running); y_spawn++) {
                 if (x_spawn == center_x && y_spawn == center_y) continue;
 
-                atomic_store(&S->current_replication, rep);
+                atomic_store(&S->current_replication, rep + 1);
                 atomic_store(&S->current_step, 0);
 
                 int x = x_spawn;
@@ -335,7 +335,6 @@ static void *sim_thread(void *arg) {
     MsgMode m = { .mode = MODE_SUMMARY };
     atomic_store(&S->mode, MODE_SUMMARY);
     clients_broadcast(S, MSG_MODE, &m, sizeof(m));
-
     atomic_store(&S->running, 0);
     return NULL;
 }
@@ -451,6 +450,9 @@ int main(int argc, char **argv) {
     }
     for (int y = 1; y < S.world_h; y++) {
         S.steps_to_center[y] = S.steps_to_center[0] + (size_t)y * (size_t)S.world_w;
+    }
+    for (int y = 1; y < S.world_h; y++) {
+        S.succesful_replications[y] = S.succesful_replications[0] + (size_t)y * (size_t)S.world_w;
     }
 
     
