@@ -63,6 +63,8 @@ typedef struct {
     FILE *results_fp;
     int **steps_to_center;
     int **succesful_replications;
+    float **prob_to_center;
+    float **avg_steps_to_center;
 
     // state
     atomic_uint mode;
@@ -109,6 +111,44 @@ static void clients_broadcast(Server *S, uint32_t type, const void *payload, uin
     pthread_mutex_unlock(&S->clients_mtx);
 }
 
+static void compute_and_send_stats(Server *S, int current_replication) {
+    if (current_replication <= 0) return;
+
+    size_t count = (size_t)S->world_w * (size_t)S->world_h;
+    size_t floats_bytes = count * sizeof(float);
+    size_t total_len = sizeof(MsgStatsHdr) + floats_bytes * 2u;
+
+    uint8_t *buf = (uint8_t*)malloc(total_len);
+    if (!buf) return;
+
+    MsgStatsHdr hdr = { .world_w = (uint32_t)S->world_w, .world_h = (uint32_t)S->world_h };
+    memcpy(buf, &hdr, sizeof(hdr));
+
+    float *prob = (float*)(buf + sizeof(hdr));
+    float *avg = prob + count;
+
+    for (int y = 0; y < S->world_h; y++) {
+        for (int x = 0; x < S->world_w; x++) {
+            int success = S->succesful_replications[y][x];
+            int steps = S->steps_to_center[y][x];
+            size_t idx = (size_t)y * (size_t)S->world_w + (size_t)x;
+
+            prob[idx] = (float)success / (float)current_replication;
+            if (success > 0) {
+                avg[idx] = (float)steps / ((float)success);
+            } else {
+                avg[idx] = 0.0f;
+            }
+
+            S->prob_to_center[y][x] = prob[idx];
+            S->avg_steps_to_center[y][x] = avg[idx];
+        }
+    }
+
+    clients_broadcast(S, MSG_STATS, buf, (uint32_t)total_len);
+    free(buf);
+}
+
 static void send_welcome(Server *S, int fd) {
     MsgWelcome w = {
         .world_w = (uint32_t)S->world_w,
@@ -122,6 +162,16 @@ static void send_welcome(Server *S, int fd) {
     MsgHdr h = { MSG_WELCOME, (uint32_t)sizeof(w) };
     (void)send_all(fd, &h, sizeof(h));
     (void)send_all(fd, &w, sizeof(w));
+}
+
+static void send_progress(Server *S, int fd) {
+    MsgProgress p = {
+        .current_replication = (uint32_t)atomic_load(&S->current_replication),
+        .total_replications = (uint32_t)S->replications
+    };
+    MsgHdr h = { MSG_PROGRESS, (uint32_t)sizeof(p) };
+    (void)send_all(fd, &h, sizeof(h));
+    (void)send_all(fd, &p, sizeof(p));
 }
 
 static void send_initial_step(Server *S, int fd) {
@@ -237,6 +287,7 @@ static void *accept_thread(void *arg) {
         c->fd = cfd;
 
         send_welcome(S, cfd);
+        send_progress(S, cfd);
         send_history(S, cfd);
 
         pthread_mutex_lock(&S->clients_mtx);
@@ -270,6 +321,11 @@ static void *sim_thread(void *arg) {
                 if (x_spawn == center_x && y_spawn == center_y) continue;
 
                 atomic_store(&S->current_replication, rep + 1);
+                MsgProgress p = {
+                    .current_replication = (uint32_t)(rep + 1),
+                    .total_replications = (uint32_t)S->replications
+                };
+                clients_broadcast(S, MSG_PROGRESS, &p, sizeof(p));
                 atomic_store(&S->current_step, 0);
 
                 int x = x_spawn;
@@ -314,8 +370,8 @@ static void *sim_thread(void *arg) {
                     pthread_mutex_unlock(&S->hist_mtx);
 
                     if (S->steps_to_center && x == center_x && y == center_y) {
-                        S->steps_to_center[center_y][center_x] += step;
-                        S->succesful_replications[center_y][center_x]++;
+                        S->steps_to_center[y_spawn][x_spawn] += step;
+                        S->succesful_replications[y_spawn][x_spawn]++;
                         break;
                     }
 
@@ -331,6 +387,7 @@ static void *sim_thread(void *arg) {
                 }*/
             }
         }
+        compute_and_send_stats(S, rep + 1);
     }
     MsgMode m = { .mode = MODE_SUMMARY };
     atomic_store(&S->mode, MODE_SUMMARY);
@@ -428,31 +485,41 @@ int main(int argc, char **argv) {
 
     S.steps_to_center = (int**)calloc((size_t)S.world_h, sizeof(*S.steps_to_center));
     S.succesful_replications = (int**)calloc((size_t)S.world_h, sizeof(*S.succesful_replications));
-    if (!S.steps_to_center || !S.succesful_replications) {
+    S.prob_to_center = (float**)calloc((size_t)S.world_h, sizeof(*S.prob_to_center));
+    S.avg_steps_to_center = (float**)calloc((size_t)S.world_h, sizeof(*S.avg_steps_to_center));
+    if (!S.steps_to_center || !S.succesful_replications || !S.prob_to_center || !S.avg_steps_to_center) {
         perror("steps_to_center || succesful_replications  rows alloc");
         if (S.steps_to_center) free(S.steps_to_center);
-        else if (S.succesful_replications) free(S.succesful_replications);
+        if (S.succesful_replications) free(S.succesful_replications);
+        if (S.prob_to_center) free(S.prob_to_center);
+        if (S.avg_steps_to_center) free(S.avg_steps_to_center);
         free(S.history);
         fclose(S.results_fp);
         return 1;
     }
     S.steps_to_center[0] = (int*)calloc((size_t)S.world_w * (size_t)S.world_h,sizeof(**S.steps_to_center));
     S.succesful_replications[0] = (int*)calloc((size_t)S.world_w * (size_t)S.world_h,sizeof(**S.succesful_replications));
-    if (!S.steps_to_center[0] || !S.succesful_replications[0]) {
+    S.prob_to_center[0] = (float*)calloc((size_t)S.world_w * (size_t)S.world_h, sizeof(**S.prob_to_center));
+    S.avg_steps_to_center[0] = (float*)calloc((size_t)S.world_w * (size_t)S.world_h, sizeof(**S.avg_steps_to_center));
+    if (!S.steps_to_center[0] || !S.succesful_replications[0] || !S.prob_to_center[0] || !S.avg_steps_to_center[0]) {
         perror("steps_to_center || S.succesful_replicationsdata alloc");
-        if( S.steps_to_center[0]) free(S.steps_to_center[0]);
-        else if (S.succesful_replications[0]) free(S.succesful_replications[0]);
+        if (S.steps_to_center[0]) free(S.steps_to_center[0]);
+        if (S.succesful_replications[0]) free(S.succesful_replications[0]);
+        if (S.prob_to_center[0]) free(S.prob_to_center[0]);
+        if (S.avg_steps_to_center[0]) free(S.avg_steps_to_center[0]);
         free(S.succesful_replications);
         free(S.steps_to_center);
+        free(S.prob_to_center);
+        free(S.avg_steps_to_center);
         free(S.history);
         fclose(S.results_fp);
         return 1;
     }
     for (int y = 1; y < S.world_h; y++) {
         S.steps_to_center[y] = S.steps_to_center[0] + (size_t)y * (size_t)S.world_w;
-    }
-    for (int y = 1; y < S.world_h; y++) {
         S.succesful_replications[y] = S.succesful_replications[0] + (size_t)y * (size_t)S.world_w;
+        S.prob_to_center[y] = S.prob_to_center[0] + (size_t)y * (size_t)S.world_w;
+        S.avg_steps_to_center[y] = S.avg_steps_to_center[0] + (size_t)y * (size_t)S.world_w;
     }
 
     
@@ -488,6 +555,18 @@ int main(int argc, char **argv) {
     if (S.steps_to_center) {
         free(S.steps_to_center[0]);
         free(S.steps_to_center);
+    }
+    if (S.succesful_replications) {
+        free(S.succesful_replications[0]);
+        free(S.succesful_replications);
+    }
+    if (S.prob_to_center) {
+        free(S.prob_to_center[0]);
+        free(S.prob_to_center);
+    }
+    if (S.avg_steps_to_center) {
+        free(S.avg_steps_to_center[0]);
+        free(S.avg_steps_to_center);
     }
     free(S.history);
 

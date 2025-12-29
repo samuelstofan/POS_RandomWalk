@@ -10,6 +10,7 @@ typedef enum {
     MSG_PROGRESS= 4,
     MSG_STOP    = 5,
     MSG_ERROR   = 6,
+    MSG_STATS   = 7,
 } MsgType;
 
 typedef enum {
@@ -42,4 +43,14 @@ typedef struct {
 typedef struct {
     uint32_t mode; // SimMode
 } MsgMode;
+
+typedef struct {
+    uint32_t current_replication;
+    uint32_t total_replications;
+} MsgProgress;
+
+typedef struct {
+    uint32_t world_w;
+    uint32_t world_h;
+} MsgStatsHdr;
 #pragma pack(pop)
