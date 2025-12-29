@@ -245,10 +245,10 @@ int main(int argc, char **argv) {
     const char *server_bin = getenv("SERVER_BIN");
     if (!server_bin) server_bin = "./server";
 
-    int world_w = 101, world_h = 101;
+    int world_w = 51, world_h = 51;
     int delay_ms = 10;
-    int replications = 50;
-    int max_steps    = 1000;    
+    int replications = 1;
+    int max_steps    = 10;    
     float pU=0.25f, pD=0.25f, pL=0.25f, pR=0.25f;
 
     uint32_t last_step_index = 0;
@@ -288,7 +288,7 @@ int main(int argc, char **argv) {
 
     C.win_w = 1800; C.win_h = 1400;
 
-    SDL_Window *win = SDL_CreateWindow("Random Walk Client (Phase A)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, C.win_w, C.win_h, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("Random Walk Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, C.win_w, C.win_h, SDL_WINDOW_SHOWN);
     if (!win) {
         fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
         SDL_Quit();
@@ -405,8 +405,14 @@ int main(int argc, char **argv) {
                         world_to_screen(&C, prev_x, prev_y, &sx, &sy);
 
                         SDL_SetRenderTarget(ren, canvas);
-                        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+                        SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
                         draw_big_point(ren, sx, sy, 4);
+
+                        int cx, cy;
+                        world_to_screen(&C, world_h/2, world_h/2, &cx, &cy);
+                        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+                        draw_big_point(ren, cx, cy, 4);
+
 
                         start_point_drawn = 1;
                     }
@@ -429,8 +435,7 @@ int main(int argc, char **argv) {
 
             SDL_SetRenderTarget(ren, NULL);
         } else if (mode_now == MODE_SUMMARY) {
-            SDL_SetRenderDrawColor(ren, 40, 40, 60, 255);
-            SDL_RenderClear(ren);
+            
         }
 
         SDL_SetRenderDrawColor(ren, 10, 10, 14, 255);

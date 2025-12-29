@@ -61,6 +61,8 @@ typedef struct {
     int max_steps;
     float pU, pD, pL, pR;
     FILE *results_fp;
+    int **steps_to_center;
+    int **succesful_replications;
 
     // state
     atomic_uint mode;
@@ -257,99 +259,79 @@ static void *accept_thread(void *arg) {
     return NULL;
 }
 
-/*static void *sim_thread(void *arg) {
-    Server *S = (Server*)arg;
-
-    int x = S->world_w / 2;
-    int y = S->world_h / 2;
-    uint32_t step_index = 0;
-
-    while (atomic_load(&S->running)) {
-        float r = get_random();
-        int dx = 0, dy = 0;
-        if (r < S->pU) { dy = -1; }
-        else if (r < S->pU + S->pD) { dy = +1; }
-        else if (r < S->pU + S->pD + S->pL) { dx = -1; }
-        else { dx = +1; }
-
-        x = (x + dx) % S->world_w;
-        y = (y + dy) % S->world_h;
-
-        if (x < 0) x += S->world_w;
-        if (y < 0) y += S->world_h;
-
-        MsgStep st = { .x = x, .y = y, .step_index = ++step_index };
-        clients_broadcast(S, MSG_STEP, &st, sizeof(st));
-
-        usleep((useconds_t)S->step_delay_ms * 1000u);
-    }
-    return NULL;
-}*/
 static void *sim_thread(void *arg) {
     Server *S = (Server*)arg;
 
     int center_x = S->world_w / 2;
     int center_y = S->world_h / 2;
-
     for (int rep = 0; rep < S->replications && atomic_load(&S->running); rep++) {
+        for (int x_spawn = 0; x_spawn < S->world_w && atomic_load(&S->running); x_spawn++) {
+            for (int y_spawn = 0; y_spawn < S->world_h && atomic_load(&S->running); y_spawn++) {
+                if (x_spawn == center_x && y_spawn == center_y) continue;
 
-        atomic_store(&S->current_replication, rep);
-        atomic_store(&S->current_step, 0);
+                atomic_store(&S->current_replication, rep);
+                atomic_store(&S->current_step, 0);
 
-        int x = center_x;
-        int y = center_y;
+                int x = x_spawn;
+                int y = y_spawn;
 
-        MsgStep st0 = { .x = x, .y = y, .step_index = 0 };
-        clients_broadcast(S, MSG_STEP, &st0, sizeof(st0));
+                MsgStep st0 = { .x = x, .y = y, .step_index = 0 };
+                clients_broadcast(S, MSG_STEP, &st0, sizeof(st0));
 
-        pthread_mutex_lock(&S->hist_mtx);
-        if (S->history && S->history_cap > 0) {
-            S->history[0] = st0;
-        }
-        pthread_mutex_unlock(&S->hist_mtx);
+                pthread_mutex_lock(&S->hist_mtx);
+                if (S->history && S->history_cap > 0) {
+                    S->history[0] = st0;
+                }
+                pthread_mutex_unlock(&S->hist_mtx);
 
-        for (int step = 0;
-             step < S->max_steps && atomic_load(&S->running);
-             step++) {
+                for (int step = 0;step < S->max_steps && atomic_load(&S->running);step++) {
+                    float r = get_random();
+                    int dx = 0, dy = 0;
 
-            float r = get_random();
-            int dx = 0, dy = 0;
+                    if (r < S->pU) dy = -1;
+                    else if (r < S->pU + S->pD) dy = +1;
+                    else if (r < S->pU + S->pD + S->pL) dx = -1;
+                    else dx = +1;
 
-            if (r < S->pU) dy = -1;
-            else if (r < S->pU + S->pD) dy = +1;
-            else if (r < S->pU + S->pD + S->pL) dx = -1;
-            else dx = +1;
+                    x = (x + dx) % S->world_w;
+                    y = (y + dy) % S->world_h;
+                    if (x < 0) x += S->world_w;
+                    if (y < 0) y += S->world_h;
 
-            x = (x + dx) % S->world_w;
-            y = (y + dy) % S->world_h;
-            if (x < 0) x += S->world_w;
-            if (y < 0) y += S->world_h;
+                    atomic_store(&S->current_step, step + 1);
 
-            atomic_store(&S->current_step, step + 1);
+                    MsgStep st = {
+                        .x = x,
+                        .y = y,
+                        .step_index = step + 1
+                    };
+                    clients_broadcast(S, MSG_STEP, &st, sizeof(st));
+                    
+                    pthread_mutex_lock(&S->hist_mtx);
+                    if (S->history && (step + 1) < S->history_cap) {
+                        S->history[step + 1] = st;
+                    }
+                    pthread_mutex_unlock(&S->hist_mtx);
 
-            MsgStep st = {
-                .x = x,
-                .y = y,
-                .step_index = step + 1
-            };
-            clients_broadcast(S, MSG_STEP, &st, sizeof(st));
-            
-            pthread_mutex_lock(&S->hist_mtx);
-            if (S->history && (step + 1) < S->history_cap) {
-                S->history[step + 1] = st;
+                    if (S->steps_to_center && x == center_x && y == center_y) {
+                        S->steps_to_center[center_y][center_x] += step;
+                        S->succesful_replications[center_y][center_x]++;
+                        break;
+                    }
+
+                    if (atomic_load(&S->mode) != MODE_SUMMARY) {
+                        usleep((useconds_t)S->step_delay_ms * 1000u);
+                    } 
+                }
+
+                /*if (S->results_fp) {
+                    int manhattan = abs(x - center_x) + abs(y - center_y);
+                    fprintf(S->results_fp, "%d,%d\n", rep, manhattan);
+                    fflush(S->results_fp);
+                }*/
             }
-            pthread_mutex_unlock(&S->hist_mtx);
-
-            usleep((useconds_t)S->step_delay_ms * 1000u);
-        }
-
-        if (S->results_fp) {
-            int manhattan = abs(x - center_x) + abs(y - center_y);
-            fprintf(S->results_fp, "%d,%d\n", rep, manhattan);
-            fflush(S->results_fp);
         }
     }
-
     MsgMode m = { .mode = MODE_SUMMARY };
     atomic_store(&S->mode, MODE_SUMMARY);
     clients_broadcast(S, MSG_MODE, &m, sizeof(m));
@@ -357,7 +339,6 @@ static void *sim_thread(void *arg) {
     atomic_store(&S->running, 0);
     return NULL;
 }
-
 
 static int make_listen_socket(Server *S) {
     S->listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -446,6 +427,34 @@ int main(int argc, char **argv) {
     S.history[0].y = S.world_h / 2;
     S.history[0].step_index = 0;
 
+    S.steps_to_center = (int**)calloc((size_t)S.world_h, sizeof(*S.steps_to_center));
+    S.succesful_replications = (int**)calloc((size_t)S.world_h, sizeof(*S.succesful_replications));
+    if (!S.steps_to_center || !S.succesful_replications) {
+        perror("steps_to_center || succesful_replications  rows alloc");
+        if (S.steps_to_center) free(S.steps_to_center);
+        else if (S.succesful_replications) free(S.succesful_replications);
+        free(S.history);
+        fclose(S.results_fp);
+        return 1;
+    }
+    S.steps_to_center[0] = (int*)calloc((size_t)S.world_w * (size_t)S.world_h,sizeof(**S.steps_to_center));
+    S.succesful_replications[0] = (int*)calloc((size_t)S.world_w * (size_t)S.world_h,sizeof(**S.succesful_replications));
+    if (!S.steps_to_center[0] || !S.succesful_replications[0]) {
+        perror("steps_to_center || S.succesful_replicationsdata alloc");
+        if( S.steps_to_center[0]) free(S.steps_to_center[0]);
+        else if (S.succesful_replications[0]) free(S.succesful_replications[0]);
+        free(S.succesful_replications);
+        free(S.steps_to_center);
+        free(S.history);
+        fclose(S.results_fp);
+        return 1;
+    }
+    for (int y = 1; y < S.world_h; y++) {
+        S.steps_to_center[y] = S.steps_to_center[0] + (size_t)y * (size_t)S.world_w;
+    }
+
+    
+
     if (make_listen_socket(&S) != 0) {
         perror("server socket");
         fclose(S.results_fp);
@@ -473,6 +482,13 @@ int main(int argc, char **argv) {
     }
     close(S.listen_fd);
     unlink(S.sock_path);
+
+    if (S.steps_to_center) {
+        free(S.steps_to_center[0]);
+        free(S.steps_to_center);
+    }
+    free(S.history);
+
     fclose(S.results_fp);
     fprintf(stdout, "SERVER SHUTDOWN\n");
     fflush(stdout);
