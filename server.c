@@ -68,6 +68,11 @@ typedef struct {
     atomic_int current_replication;
     atomic_int current_step;
 
+    // step history for late joiners (current replication)
+    pthread_mutex_t hist_mtx;
+    MsgStep *history;
+    int history_cap;
+
     // clients
     pthread_mutex_t clients_mtx;
     Client *clients;
@@ -126,6 +131,36 @@ static void send_initial_step(Server *S, int fd) {
     MsgHdr h = { MSG_STEP, (uint32_t)sizeof(st) };
     (void)send_all(fd, &h, sizeof(h));
     (void)send_all(fd, &st, sizeof(st));
+}
+
+static void send_history(Server *S, int fd) {
+    int count = 0;
+    MsgStep *tmp = NULL;
+
+    pthread_mutex_lock(&S->hist_mtx);
+    int current = atomic_load(&S->current_step);
+    if (current < 0) current = 0;
+    if (current >= S->history_cap) current = S->history_cap - 1;
+    count = current + 1;
+    if (count > 0) {
+        tmp = (MsgStep*)malloc((size_t)count * sizeof(*tmp));
+        if (tmp) {
+            memcpy(tmp, S->history, (size_t)count * sizeof(*tmp));
+        }
+    }
+    pthread_mutex_unlock(&S->hist_mtx);
+
+    if (!tmp) {
+        send_initial_step(S, fd);
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        MsgHdr h = { MSG_STEP, (uint32_t)sizeof(tmp[i]) };
+        (void)send_all(fd, &h, sizeof(h));
+        (void)send_all(fd, &tmp[i], sizeof(tmp[i]));
+    }
+    free(tmp);
 }
 
 static void *client_reader_thread(void *arg) {
@@ -200,7 +235,7 @@ static void *accept_thread(void *arg) {
         c->fd = cfd;
 
         send_welcome(S, cfd);
-        send_initial_step(S, cfd);
+        send_history(S, cfd);
 
         pthread_mutex_lock(&S->clients_mtx);
         c->next = S->clients;
@@ -267,6 +302,12 @@ static void *sim_thread(void *arg) {
         MsgStep st0 = { .x = x, .y = y, .step_index = 0 };
         clients_broadcast(S, MSG_STEP, &st0, sizeof(st0));
 
+        pthread_mutex_lock(&S->hist_mtx);
+        if (S->history && S->history_cap > 0) {
+            S->history[0] = st0;
+        }
+        pthread_mutex_unlock(&S->hist_mtx);
+
         for (int step = 0;
              step < S->max_steps && atomic_load(&S->running);
              step++) {
@@ -292,6 +333,12 @@ static void *sim_thread(void *arg) {
                 .step_index = step + 1
             };
             clients_broadcast(S, MSG_STEP, &st, sizeof(st));
+            
+            pthread_mutex_lock(&S->hist_mtx);
+            if (S->history && (step + 1) < S->history_cap) {
+                S->history[step + 1] = st;
+            }
+            pthread_mutex_unlock(&S->hist_mtx);
 
             usleep((useconds_t)S->step_delay_ms * 1000u);
         }
@@ -343,6 +390,7 @@ int main(int argc, char **argv) {
     Server S;
     memset(&S, 0, sizeof(S));
     pthread_mutex_init(&S.clients_mtx, NULL);
+    pthread_mutex_init(&S.hist_mtx, NULL);
 
     strncpy(S.sock_path, argv[1], sizeof(S.sock_path) - 1);
     S.world_w = atoi(argv[2]);
@@ -386,6 +434,17 @@ int main(int argc, char **argv) {
 
     signal(SIGINT, on_sigint);
     signal(SIGTERM, on_sigint);
+
+    S.history_cap = S.max_steps + 1;
+    S.history = (MsgStep*)calloc((size_t)S.history_cap, sizeof(*S.history));
+    if (!S.history) {
+        perror("history alloc");
+        fclose(S.results_fp);
+        return 1;
+    }
+    S.history[0].x = S.world_w / 2;
+    S.history[0].y = S.world_h / 2;
+    S.history[0].step_index = 0;
 
     if (make_listen_socket(&S) != 0) {
         perror("server socket");

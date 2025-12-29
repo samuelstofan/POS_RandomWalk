@@ -247,8 +247,8 @@ int main(int argc, char **argv) {
 
     int world_w = 101, world_h = 101;
     int delay_ms = 10;
-    int replications = 5;
-    int max_steps    = 100;    
+    int replications = 50;
+    int max_steps    = 1000;    
     float pU=0.25f, pD=0.25f, pL=0.25f, pR=0.25f;
 
     uint32_t last_step_index = 0;
@@ -288,8 +288,7 @@ int main(int argc, char **argv) {
 
     C.win_w = 1800; C.win_h = 1400;
 
-    SDL_Window *win = SDL_CreateWindow("Random Walk Client (Phase A)",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, C.win_w, C.win_h, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("Random Walk Client (Phase A)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, C.win_w, C.win_h, SDL_WINDOW_SHOWN);
     if (!win) {
         fprintf(stderr, "SDL_CreateWindow: %s\n", SDL_GetError());
         SDL_Quit();
@@ -312,13 +311,7 @@ int main(int argc, char **argv) {
     C.win_h = rh;
 
 
-    SDL_Texture *canvas = SDL_CreateTexture(
-        ren,
-        SDL_PIXELFORMAT_RGBA8888,
-        SDL_TEXTUREACCESS_TARGET,
-        C.win_w,
-        C.win_h
-    );
+    SDL_Texture *canvas = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, C.win_w, C.win_h    );
 
     if (!canvas) {
         fprintf(stderr, "SDL_CreateTexture: %s\n", SDL_GetError());
@@ -459,7 +452,7 @@ int main(int argc, char **argv) {
 
     atomic_store(&C.running, 0);
     shutdown(C.sockfd, SHUT_RDWR);
-    close(C.sockfd);
+    close(C.sockfd); 
     pthread_join(th, NULL);
     SDL_DestroyTexture(canvas);
     SDL_DestroyRenderer(ren);
