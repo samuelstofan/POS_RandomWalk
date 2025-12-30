@@ -240,9 +240,6 @@ static void *client_reader_thread(void *arg) {
             fprintf(stderr, "Server: STOP received\n");
             atomic_store(&S->running, 0);
             atomic_store(&S->waiting_before_shutdown, 0);
-            //close(S->listen_fd);
-            //unlink(S->sock_path);
-            //g_stop = 1;
             break;
         }
 
@@ -416,8 +413,8 @@ static void on_sigint(int sig) { (void)sig; g_stop = 1; }
 int main(int argc, char **argv) {
     if (argc < 11) {
         fprintf(stderr,
-            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR>\n"
-            "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25\n",
+            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR> [output_file]\n"
+            "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25 results.csv\n",
             argv[0], argv[0]);
         return 2;
     }
@@ -439,10 +436,11 @@ int main(int argc, char **argv) {
     S.pD = strtof(argv[8], NULL);
     S.pL = strtof(argv[9], NULL);
     S.pR = strtof(argv[10], NULL);
+    const char *results_path = (argc >= 12) ? argv[11] : "replication_results.csv";
 
-    S.results_fp = fopen("replication_results.csv", "w");
+    S.results_fp = fopen(results_path, "w");
     if (!S.results_fp) {
-        perror("replication_results.csv");
+        perror(results_path);
         return 1;
     }
     fprintf(S.results_fp, "replication,manhattan_distance\n");
@@ -571,7 +569,5 @@ int main(int argc, char **argv) {
     free(S.history);
 
     fclose(S.results_fp);
-    fprintf(stdout, "SERVER SHUTDOWN\n");
-    fflush(stdout);
     return 0;
 }
