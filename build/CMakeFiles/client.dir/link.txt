@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/client.dir/link.d CMakeFiles/client.dir/src/client.c.o -o client  -lSDL2 -lSDL2_ttf -lSDL2 -lpthread -lm -lSDL2_ttf -lpthread -lm

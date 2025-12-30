@@ -1,0 +1,4 @@
+/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles/server.dir
+/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles/client.dir
+/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles/edit_cache.dir
+/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles/rebuild_cache.dir

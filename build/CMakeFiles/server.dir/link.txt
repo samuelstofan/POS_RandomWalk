@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/server.dir/link.d CMakeFiles/server.dir/src/server.c.o -o server  -lSDL2 -lSDL2_ttf -lSDL2 -lpthread -lSDL2_ttf -lpthread
