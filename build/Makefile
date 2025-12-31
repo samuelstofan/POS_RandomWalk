@@ -166,6 +166,249 @@ src/client.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client.c.s
 .PHONY : src/client.c.s
 
+src/client_fifo.o: src/client_fifo.c.o
+.PHONY : src/client_fifo.o
+
+# target to build an object file
+src/client_fifo.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_fifo.c.o
+.PHONY : src/client_fifo.c.o
+
+src/client_fifo.i: src/client_fifo.c.i
+.PHONY : src/client_fifo.i
+
+# target to preprocess a source file
+src/client_fifo.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_fifo.c.i
+.PHONY : src/client_fifo.c.i
+
+src/client_fifo.s: src/client_fifo.c.s
+.PHONY : src/client_fifo.s
+
+# target to generate assembly for a file
+src/client_fifo.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_fifo.c.s
+.PHONY : src/client_fifo.c.s
+
+src/client_lifecycle.o: src/client_lifecycle.c.o
+.PHONY : src/client_lifecycle.o
+
+# target to build an object file
+src/client_lifecycle.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.o
+.PHONY : src/client_lifecycle.c.o
+
+src/client_lifecycle.i: src/client_lifecycle.c.i
+.PHONY : src/client_lifecycle.i
+
+# target to preprocess a source file
+src/client_lifecycle.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.i
+.PHONY : src/client_lifecycle.c.i
+
+src/client_lifecycle.s: src/client_lifecycle.c.s
+.PHONY : src/client_lifecycle.s
+
+# target to generate assembly for a file
+src/client_lifecycle.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.s
+.PHONY : src/client_lifecycle.c.s
+
+src/client_menu.o: src/client_menu.c.o
+.PHONY : src/client_menu.o
+
+# target to build an object file
+src/client_menu.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_menu.c.o
+.PHONY : src/client_menu.c.o
+
+src/client_menu.i: src/client_menu.c.i
+.PHONY : src/client_menu.i
+
+# target to preprocess a source file
+src/client_menu.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_menu.c.i
+.PHONY : src/client_menu.c.i
+
+src/client_menu.s: src/client_menu.c.s
+.PHONY : src/client_menu.s
+
+# target to generate assembly for a file
+src/client_menu.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_menu.c.s
+.PHONY : src/client_menu.c.s
+
+src/client_net.o: src/client_net.c.o
+.PHONY : src/client_net.o
+
+# target to build an object file
+src/client_net.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_net.c.o
+.PHONY : src/client_net.c.o
+
+src/client_net.i: src/client_net.c.i
+.PHONY : src/client_net.i
+
+# target to preprocess a source file
+src/client_net.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_net.c.i
+.PHONY : src/client_net.c.i
+
+src/client_net.s: src/client_net.c.s
+.PHONY : src/client_net.s
+
+# target to generate assembly for a file
+src/client_net.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_net.c.s
+.PHONY : src/client_net.c.s
+
+src/client_render.o: src/client_render.c.o
+.PHONY : src/client_render.o
+
+# target to build an object file
+src/client_render.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_render.c.o
+.PHONY : src/client_render.c.o
+
+src/client_render.i: src/client_render.c.i
+.PHONY : src/client_render.i
+
+# target to preprocess a source file
+src/client_render.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_render.c.i
+.PHONY : src/client_render.c.i
+
+src/client_render.s: src/client_render.c.s
+.PHONY : src/client_render.s
+
+# target to generate assembly for a file
+src/client_render.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_render.c.s
+.PHONY : src/client_render.c.s
+
+src/client_replay.o: src/client_replay.c.o
+.PHONY : src/client_replay.o
+
+# target to build an object file
+src/client_replay.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_replay.c.o
+.PHONY : src/client_replay.c.o
+
+src/client_replay.i: src/client_replay.c.i
+.PHONY : src/client_replay.i
+
+# target to preprocess a source file
+src/client_replay.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_replay.c.i
+.PHONY : src/client_replay.c.i
+
+src/client_replay.s: src/client_replay.c.s
+.PHONY : src/client_replay.s
+
+# target to generate assembly for a file
+src/client_replay.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_replay.c.s
+.PHONY : src/client_replay.c.s
+
+src/client_spawn.o: src/client_spawn.c.o
+.PHONY : src/client_spawn.o
+
+# target to build an object file
+src/client_spawn.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_spawn.c.o
+.PHONY : src/client_spawn.c.o
+
+src/client_spawn.i: src/client_spawn.c.i
+.PHONY : src/client_spawn.i
+
+# target to preprocess a source file
+src/client_spawn.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_spawn.c.i
+.PHONY : src/client_spawn.c.i
+
+src/client_spawn.s: src/client_spawn.c.s
+.PHONY : src/client_spawn.s
+
+# target to generate assembly for a file
+src/client_spawn.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_spawn.c.s
+.PHONY : src/client_spawn.c.s
+
+src/client_stats.o: src/client_stats.c.o
+.PHONY : src/client_stats.o
+
+# target to build an object file
+src/client_stats.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_stats.c.o
+.PHONY : src/client_stats.c.o
+
+src/client_stats.i: src/client_stats.c.i
+.PHONY : src/client_stats.i
+
+# target to preprocess a source file
+src/client_stats.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_stats.c.i
+.PHONY : src/client_stats.c.i
+
+src/client_stats.s: src/client_stats.c.s
+.PHONY : src/client_stats.s
+
+# target to generate assembly for a file
+src/client_stats.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_stats.c.s
+.PHONY : src/client_stats.c.s
+
+src/client_ui.o: src/client_ui.c.o
+.PHONY : src/client_ui.o
+
+# target to build an object file
+src/client_ui.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_ui.c.o
+.PHONY : src/client_ui.c.o
+
+src/client_ui.i: src/client_ui.c.i
+.PHONY : src/client_ui.i
+
+# target to preprocess a source file
+src/client_ui.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_ui.c.i
+.PHONY : src/client_ui.c.i
+
+src/client_ui.s: src/client_ui.c.s
+.PHONY : src/client_ui.s
+
+# target to generate assembly for a file
+src/client_ui.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_ui.c.s
+.PHONY : src/client_ui.c.s
+
+src/protocol.o: src/protocol.c.o
+.PHONY : src/protocol.o
+
+# target to build an object file
+src/protocol.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/protocol.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/protocol.c.o
+.PHONY : src/protocol.c.o
+
+src/protocol.i: src/protocol.c.i
+.PHONY : src/protocol.i
+
+# target to preprocess a source file
+src/protocol.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/protocol.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/protocol.c.i
+.PHONY : src/protocol.c.i
+
+src/protocol.s: src/protocol.c.s
+.PHONY : src/protocol.s
+
+# target to generate assembly for a file
+src/protocol.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/protocol.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/protocol.c.s
+.PHONY : src/protocol.c.s
+
 src/server.o: src/server.c.o
 .PHONY : src/server.o
 
@@ -190,6 +433,54 @@ src/server.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server.c.s
 .PHONY : src/server.c.s
 
+src/server_net.o: src/server_net.c.o
+.PHONY : src/server_net.o
+
+# target to build an object file
+src/server_net.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_net.c.o
+.PHONY : src/server_net.c.o
+
+src/server_net.i: src/server_net.c.i
+.PHONY : src/server_net.i
+
+# target to preprocess a source file
+src/server_net.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_net.c.i
+.PHONY : src/server_net.c.i
+
+src/server_net.s: src/server_net.c.s
+.PHONY : src/server_net.s
+
+# target to generate assembly for a file
+src/server_net.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_net.c.s
+.PHONY : src/server_net.c.s
+
+src/server_sim.o: src/server_sim.c.o
+.PHONY : src/server_sim.o
+
+# target to build an object file
+src/server_sim.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_sim.c.o
+.PHONY : src/server_sim.c.o
+
+src/server_sim.i: src/server_sim.c.i
+.PHONY : src/server_sim.i
+
+# target to preprocess a source file
+src/server_sim.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_sim.c.i
+.PHONY : src/server_sim.c.i
+
+src/server_sim.s: src/server_sim.c.s
+.PHONY : src/server_sim.s
+
+# target to generate assembly for a file
+src/server_sim.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/server_sim.c.s
+.PHONY : src/server_sim.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -203,9 +494,45 @@ help:
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"
+	@echo "... src/client_fifo.o"
+	@echo "... src/client_fifo.i"
+	@echo "... src/client_fifo.s"
+	@echo "... src/client_lifecycle.o"
+	@echo "... src/client_lifecycle.i"
+	@echo "... src/client_lifecycle.s"
+	@echo "... src/client_menu.o"
+	@echo "... src/client_menu.i"
+	@echo "... src/client_menu.s"
+	@echo "... src/client_net.o"
+	@echo "... src/client_net.i"
+	@echo "... src/client_net.s"
+	@echo "... src/client_render.o"
+	@echo "... src/client_render.i"
+	@echo "... src/client_render.s"
+	@echo "... src/client_replay.o"
+	@echo "... src/client_replay.i"
+	@echo "... src/client_replay.s"
+	@echo "... src/client_spawn.o"
+	@echo "... src/client_spawn.i"
+	@echo "... src/client_spawn.s"
+	@echo "... src/client_stats.o"
+	@echo "... src/client_stats.i"
+	@echo "... src/client_stats.s"
+	@echo "... src/client_ui.o"
+	@echo "... src/client_ui.i"
+	@echo "... src/client_ui.s"
+	@echo "... src/protocol.o"
+	@echo "... src/protocol.i"
+	@echo "... src/protocol.s"
 	@echo "... src/server.o"
 	@echo "... src/server.i"
 	@echo "... src/server.s"
+	@echo "... src/server_net.o"
+	@echo "... src/server_net.i"
+	@echo "... src/server_net.s"
+	@echo "... src/server_sim.o"
+	@echo "... src/server_sim.i"
+	@echo "... src/server_sim.s"
 .PHONY : help
 
 

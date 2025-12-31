@@ -3,6 +3,16 @@ client: \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crti.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o \
   CMakeFiles/client.dir/src/client.c.o \
+  CMakeFiles/client.dir/src/client_menu.c.o \
+  CMakeFiles/client.dir/src/client_ui.c.o \
+  CMakeFiles/client.dir/src/client_replay.c.o \
+  CMakeFiles/client.dir/src/client_net.c.o \
+  CMakeFiles/client.dir/src/client_fifo.c.o \
+  CMakeFiles/client.dir/src/client_render.c.o \
+  CMakeFiles/client.dir/src/client_stats.c.o \
+  CMakeFiles/client.dir/src/client_spawn.c.o \
+  CMakeFiles/client.dir/src/client_lifecycle.c.o \
+  CMakeFiles/client.dir/src/protocol.c.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2_ttf.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so \
@@ -58,6 +68,26 @@ client: \
 /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o:
 
 CMakeFiles/client.dir/src/client.c.o:
+
+CMakeFiles/client.dir/src/client_menu.c.o:
+
+CMakeFiles/client.dir/src/client_ui.c.o:
+
+CMakeFiles/client.dir/src/client_replay.c.o:
+
+CMakeFiles/client.dir/src/client_net.c.o:
+
+CMakeFiles/client.dir/src/client_fifo.c.o:
+
+CMakeFiles/client.dir/src/client_render.c.o:
+
+CMakeFiles/client.dir/src/client_stats.c.o:
+
+CMakeFiles/client.dir/src/client_spawn.c.o:
+
+CMakeFiles/client.dir/src/client_lifecycle.c.o:
+
+CMakeFiles/client.dir/src/protocol.c.o:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so:
 

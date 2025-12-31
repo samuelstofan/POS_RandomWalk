@@ -75,4 +75,7 @@ CMakeFiles/server.dir/src/server.c.o: \
  /usr/include/bits/sigstksz.h /usr/include/bits/ss_flags.h \
  /usr/include/bits/types/struct_sigstack.h /usr/include/bits/sigthread.h \
  /usr/include/bits/signal_ext.h \
- /home/samuel/Plocha/POS/POS_RandomWalk/src/shared.h
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/server_types.h \
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/shared.h \
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.h \
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.h

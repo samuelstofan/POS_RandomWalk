@@ -3,6 +3,9 @@ server: \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crti.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o \
   CMakeFiles/server.dir/src/server.c.o \
+  CMakeFiles/server.dir/src/server_net.c.o \
+  CMakeFiles/server.dir/src/server_sim.c.o \
+  CMakeFiles/server.dir/src/protocol.c.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2_ttf.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so \
@@ -49,6 +52,12 @@ server: \
 /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o:
 
 CMakeFiles/server.dir/src/server.c.o:
+
+CMakeFiles/server.dir/src/server_net.c.o:
+
+CMakeFiles/server.dir/src/server_sim.c.o:
+
+CMakeFiles/server.dir/src/protocol.c.o:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so:
 

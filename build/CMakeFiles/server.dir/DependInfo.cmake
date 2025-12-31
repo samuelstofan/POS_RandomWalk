@@ -8,7 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c" "CMakeFiles/server.dir/src/protocol.c.o" "gcc" "CMakeFiles/server.dir/src/protocol.c.o.d"
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/server.c" "CMakeFiles/server.dir/src/server.c.o" "gcc" "CMakeFiles/server.dir/src/server.c.o.d"
+  "/home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.c" "CMakeFiles/server.dir/src/server_net.c.o" "gcc" "CMakeFiles/server.dir/src/server_net.c.o.d"
+  "/home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.c" "CMakeFiles/server.dir/src/server_sim.c.o" "gcc" "CMakeFiles/server.dir/src/server_sim.c.o.d"
   "" "server" "gcc" "CMakeFiles/server.dir/link.d"
   )
 

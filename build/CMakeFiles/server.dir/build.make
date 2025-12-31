@@ -86,18 +86,66 @@ CMakeFiles/server.dir/src/server.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/server.dir/src/server.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/server.c -o CMakeFiles/server.dir/src/server.c.s
 
+CMakeFiles/server.dir/src/server_net.c.o: CMakeFiles/server.dir/flags.make
+CMakeFiles/server.dir/src/server_net.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.c
+CMakeFiles/server.dir/src/server_net.c.o: CMakeFiles/server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/server.dir/src/server_net.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/server.dir/src/server_net.c.o -MF CMakeFiles/server.dir/src/server_net.c.o.d -o CMakeFiles/server.dir/src/server_net.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.c
+
+CMakeFiles/server.dir/src/server_net.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/server.dir/src/server_net.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.c > CMakeFiles/server.dir/src/server_net.c.i
+
+CMakeFiles/server.dir/src/server_net.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/server.dir/src/server_net.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/server_net.c -o CMakeFiles/server.dir/src/server_net.c.s
+
+CMakeFiles/server.dir/src/server_sim.c.o: CMakeFiles/server.dir/flags.make
+CMakeFiles/server.dir/src/server_sim.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.c
+CMakeFiles/server.dir/src/server_sim.c.o: CMakeFiles/server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/server.dir/src/server_sim.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/server.dir/src/server_sim.c.o -MF CMakeFiles/server.dir/src/server_sim.c.o.d -o CMakeFiles/server.dir/src/server_sim.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.c
+
+CMakeFiles/server.dir/src/server_sim.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/server.dir/src/server_sim.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.c > CMakeFiles/server.dir/src/server_sim.c.i
+
+CMakeFiles/server.dir/src/server_sim.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/server.dir/src/server_sim.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/server_sim.c -o CMakeFiles/server.dir/src/server_sim.c.s
+
+CMakeFiles/server.dir/src/protocol.c.o: CMakeFiles/server.dir/flags.make
+CMakeFiles/server.dir/src/protocol.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c
+CMakeFiles/server.dir/src/protocol.c.o: CMakeFiles/server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/server.dir/src/protocol.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/server.dir/src/protocol.c.o -MF CMakeFiles/server.dir/src/protocol.c.o.d -o CMakeFiles/server.dir/src/protocol.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c
+
+CMakeFiles/server.dir/src/protocol.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/server.dir/src/protocol.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c > CMakeFiles/server.dir/src/protocol.c.i
+
+CMakeFiles/server.dir/src/protocol.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/server.dir/src/protocol.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c -o CMakeFiles/server.dir/src/protocol.c.s
+
 # Object files for target server
 server_OBJECTS = \
-"CMakeFiles/server.dir/src/server.c.o"
+"CMakeFiles/server.dir/src/server.c.o" \
+"CMakeFiles/server.dir/src/server_net.c.o" \
+"CMakeFiles/server.dir/src/server_sim.c.o" \
+"CMakeFiles/server.dir/src/protocol.c.o"
 
 # External object files for target server
 server_EXTERNAL_OBJECTS =
 
 server: CMakeFiles/server.dir/src/server.c.o
+server: CMakeFiles/server.dir/src/server_net.c.o
+server: CMakeFiles/server.dir/src/server_sim.c.o
+server: CMakeFiles/server.dir/src/protocol.c.o
 server: CMakeFiles/server.dir/build.make
 server: CMakeFiles/server.dir/compiler_depend.ts
 server: CMakeFiles/server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -86,18 +86,178 @@ CMakeFiles/client.dir/src/client.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client.c -o CMakeFiles/client.dir/src/client.c.s
 
+CMakeFiles/client.dir/src/client_menu.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_menu.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.c
+CMakeFiles/client.dir/src/client_menu.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/client.dir/src/client_menu.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_menu.c.o -MF CMakeFiles/client.dir/src/client_menu.c.o.d -o CMakeFiles/client.dir/src/client_menu.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.c
+
+CMakeFiles/client.dir/src/client_menu.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_menu.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.c > CMakeFiles/client.dir/src/client_menu.c.i
+
+CMakeFiles/client.dir/src/client_menu.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_menu.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.c -o CMakeFiles/client.dir/src/client_menu.c.s
+
+CMakeFiles/client.dir/src/client_ui.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_ui.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_ui.c
+CMakeFiles/client.dir/src/client_ui.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/client.dir/src/client_ui.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_ui.c.o -MF CMakeFiles/client.dir/src/client_ui.c.o.d -o CMakeFiles/client.dir/src/client_ui.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_ui.c
+
+CMakeFiles/client.dir/src/client_ui.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_ui.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_ui.c > CMakeFiles/client.dir/src/client_ui.c.i
+
+CMakeFiles/client.dir/src/client_ui.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_ui.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_ui.c -o CMakeFiles/client.dir/src/client_ui.c.s
+
+CMakeFiles/client.dir/src/client_replay.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_replay.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_replay.c
+CMakeFiles/client.dir/src/client_replay.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/client.dir/src/client_replay.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_replay.c.o -MF CMakeFiles/client.dir/src/client_replay.c.o.d -o CMakeFiles/client.dir/src/client_replay.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_replay.c
+
+CMakeFiles/client.dir/src/client_replay.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_replay.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_replay.c > CMakeFiles/client.dir/src/client_replay.c.i
+
+CMakeFiles/client.dir/src/client_replay.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_replay.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_replay.c -o CMakeFiles/client.dir/src/client_replay.c.s
+
+CMakeFiles/client.dir/src/client_net.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_net.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.c
+CMakeFiles/client.dir/src/client_net.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/client.dir/src/client_net.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_net.c.o -MF CMakeFiles/client.dir/src/client_net.c.o.d -o CMakeFiles/client.dir/src/client_net.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.c
+
+CMakeFiles/client.dir/src/client_net.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_net.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.c > CMakeFiles/client.dir/src/client_net.c.i
+
+CMakeFiles/client.dir/src/client_net.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_net.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.c -o CMakeFiles/client.dir/src/client_net.c.s
+
+CMakeFiles/client.dir/src/client_fifo.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_fifo.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.c
+CMakeFiles/client.dir/src/client_fifo.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/client.dir/src/client_fifo.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_fifo.c.o -MF CMakeFiles/client.dir/src/client_fifo.c.o.d -o CMakeFiles/client.dir/src/client_fifo.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.c
+
+CMakeFiles/client.dir/src/client_fifo.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_fifo.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.c > CMakeFiles/client.dir/src/client_fifo.c.i
+
+CMakeFiles/client.dir/src/client_fifo.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_fifo.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.c -o CMakeFiles/client.dir/src/client_fifo.c.s
+
+CMakeFiles/client.dir/src/client_render.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_render.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.c
+CMakeFiles/client.dir/src/client_render.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/client.dir/src/client_render.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_render.c.o -MF CMakeFiles/client.dir/src/client_render.c.o.d -o CMakeFiles/client.dir/src/client_render.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.c
+
+CMakeFiles/client.dir/src/client_render.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_render.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.c > CMakeFiles/client.dir/src/client_render.c.i
+
+CMakeFiles/client.dir/src/client_render.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_render.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.c -o CMakeFiles/client.dir/src/client_render.c.s
+
+CMakeFiles/client.dir/src/client_stats.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_stats.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_stats.c
+CMakeFiles/client.dir/src/client_stats.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/client.dir/src/client_stats.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_stats.c.o -MF CMakeFiles/client.dir/src/client_stats.c.o.d -o CMakeFiles/client.dir/src/client_stats.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_stats.c
+
+CMakeFiles/client.dir/src/client_stats.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_stats.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_stats.c > CMakeFiles/client.dir/src/client_stats.c.i
+
+CMakeFiles/client.dir/src/client_stats.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_stats.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_stats.c -o CMakeFiles/client.dir/src/client_stats.c.s
+
+CMakeFiles/client.dir/src/client_spawn.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_spawn.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_spawn.c
+CMakeFiles/client.dir/src/client_spawn.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/client.dir/src/client_spawn.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_spawn.c.o -MF CMakeFiles/client.dir/src/client_spawn.c.o.d -o CMakeFiles/client.dir/src/client_spawn.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_spawn.c
+
+CMakeFiles/client.dir/src/client_spawn.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_spawn.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_spawn.c > CMakeFiles/client.dir/src/client_spawn.c.i
+
+CMakeFiles/client.dir/src/client_spawn.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_spawn.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_spawn.c -o CMakeFiles/client.dir/src/client_spawn.c.s
+
+CMakeFiles/client.dir/src/client_lifecycle.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/client_lifecycle.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.c
+CMakeFiles/client.dir/src/client_lifecycle.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/client.dir/src/client_lifecycle.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/client_lifecycle.c.o -MF CMakeFiles/client.dir/src/client_lifecycle.c.o.d -o CMakeFiles/client.dir/src/client_lifecycle.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.c
+
+CMakeFiles/client.dir/src/client_lifecycle.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/client_lifecycle.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.c > CMakeFiles/client.dir/src/client_lifecycle.c.i
+
+CMakeFiles/client.dir/src/client_lifecycle.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/client_lifecycle.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.c -o CMakeFiles/client.dir/src/client_lifecycle.c.s
+
+CMakeFiles/client.dir/src/protocol.c.o: CMakeFiles/client.dir/flags.make
+CMakeFiles/client.dir/src/protocol.c.o: /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c
+CMakeFiles/client.dir/src/protocol.c.o: CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/client.dir/src/protocol.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/client.dir/src/protocol.c.o -MF CMakeFiles/client.dir/src/protocol.c.o.d -o CMakeFiles/client.dir/src/protocol.c.o -c /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c
+
+CMakeFiles/client.dir/src/protocol.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/client.dir/src/protocol.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c > CMakeFiles/client.dir/src/protocol.c.i
+
+CMakeFiles/client.dir/src/protocol.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/client.dir/src/protocol.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samuel/Plocha/POS/POS_RandomWalk/src/protocol.c -o CMakeFiles/client.dir/src/protocol.c.s
+
 # Object files for target client
 client_OBJECTS = \
-"CMakeFiles/client.dir/src/client.c.o"
+"CMakeFiles/client.dir/src/client.c.o" \
+"CMakeFiles/client.dir/src/client_menu.c.o" \
+"CMakeFiles/client.dir/src/client_ui.c.o" \
+"CMakeFiles/client.dir/src/client_replay.c.o" \
+"CMakeFiles/client.dir/src/client_net.c.o" \
+"CMakeFiles/client.dir/src/client_fifo.c.o" \
+"CMakeFiles/client.dir/src/client_render.c.o" \
+"CMakeFiles/client.dir/src/client_stats.c.o" \
+"CMakeFiles/client.dir/src/client_spawn.c.o" \
+"CMakeFiles/client.dir/src/client_lifecycle.c.o" \
+"CMakeFiles/client.dir/src/protocol.c.o"
 
 # External object files for target client
 client_EXTERNAL_OBJECTS =
 
 client: CMakeFiles/client.dir/src/client.c.o
+client: CMakeFiles/client.dir/src/client_menu.c.o
+client: CMakeFiles/client.dir/src/client_ui.c.o
+client: CMakeFiles/client.dir/src/client_replay.c.o
+client: CMakeFiles/client.dir/src/client_net.c.o
+client: CMakeFiles/client.dir/src/client_fifo.c.o
+client: CMakeFiles/client.dir/src/client_render.c.o
+client: CMakeFiles/client.dir/src/client_stats.c.o
+client: CMakeFiles/client.dir/src/client_spawn.c.o
+client: CMakeFiles/client.dir/src/client_lifecycle.c.o
+client: CMakeFiles/client.dir/src/protocol.c.o
 client: CMakeFiles/client.dir/build.make
 client: CMakeFiles/client.dir/compiler_depend.ts
 client: CMakeFiles/client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/samuel/Plocha/POS/POS_RandomWalk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking C executable client"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/client.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
