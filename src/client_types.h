@@ -27,6 +27,10 @@ typedef struct {
 typedef struct {
     int world_w;
     int world_h;
+    int obstacle_mode;
+    float obstacle_density;
+    uint32_t obstacle_seed;
+    char obstacle_file[256];
     int replications;
     int max_steps;
     float pU, pD, pL, pR;
@@ -107,4 +111,9 @@ typedef struct {
     int base_w, base_h;
     int base_replications;
     int have_base_stats;
+
+    uint8_t *obstacles;
+    int obs_w, obs_h;
+    int have_obstacles;
+    int obstacles_drawn;
 } ClientState;

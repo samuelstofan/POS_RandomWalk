@@ -77,6 +77,21 @@ static void send_history(Server *S, int fd) {
     free(tmp);
 }
 
+static void send_obstacles(Server *S, int fd) {
+    if (!S->obstacles) return;
+    size_t count = (size_t)S->world_w * (size_t)S->world_h;
+    size_t total_len = sizeof(MsgObstaclesHdr) + count * sizeof(uint8_t);
+    uint8_t *buf = (uint8_t*)malloc(total_len);
+    if (!buf) return;
+    MsgObstaclesHdr hdr = { .world_w = (uint32_t)S->world_w, .world_h = (uint32_t)S->world_h };
+    memcpy(buf, &hdr, sizeof(hdr));
+    memcpy(buf + sizeof(hdr), S->obstacles, count * sizeof(uint8_t));
+    MsgHdr h = { MSG_OBSTACLES, (uint32_t)total_len };
+    (void)send_all(fd, &h, sizeof(h));
+    (void)send_all(fd, buf, (size_t)total_len);
+    free(buf);
+}
+
 void clients_broadcast(Server *S, uint32_t type, const void *payload, uint32_t len) {
     MsgHdr h = { type, len };
 
@@ -173,6 +188,7 @@ void *accept_thread(void *arg) {
         send_welcome(S, cfd);
         send_progress(S, cfd);
         send_history(S, cfd);
+        send_obstacles(S, cfd);
 
         pthread_mutex_lock(&S->clients_mtx);
         c->next = S->clients;

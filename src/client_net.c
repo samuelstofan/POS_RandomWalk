@@ -145,6 +145,28 @@ void *net_thread(void *arg) {
                 }
                 pthread_mutex_unlock(&C->stats_mtx);
             }
+        } else if (h.type == MSG_OBSTACLES && h.len >= sizeof(MsgObstaclesHdr)) {
+            MsgObstaclesHdr *oh = (MsgObstaclesHdr*)payload;
+            uint32_t w = oh->world_w;
+            uint32_t hgt = oh->world_h;
+            size_t count = (size_t)w * (size_t)hgt;
+            size_t expected = sizeof(MsgObstaclesHdr) + count * sizeof(uint8_t);
+            if (w > 0 && hgt > 0 && h.len == expected) {
+                uint8_t *obs = (uint8_t*)(payload + sizeof(MsgObstaclesHdr));
+                pthread_mutex_lock(&C->stats_mtx);
+                if (C->obs_w != (int)w || C->obs_h != (int)hgt || !C->obstacles) {
+                    free(C->obstacles);
+                    C->obstacles = (uint8_t*)malloc(count * sizeof(uint8_t));
+                    C->obs_w = (int)w;
+                    C->obs_h = (int)hgt;
+                }
+                if (C->obstacles) {
+                    memcpy(C->obstacles, obs, count * sizeof(uint8_t));
+                    C->have_obstacles = 1;
+                    C->stats_dirty = 1;
+                }
+                pthread_mutex_unlock(&C->stats_mtx);
+            }
         }
 
         if (payload) free(payload);

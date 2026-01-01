@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
+#include "client_render.h"
 
 static SDL_Texture *make_text_texture(SDL_Renderer *ren, TTF_Font *font,
                                       const char *text, SDL_Color color,
@@ -48,6 +51,7 @@ SDL_Texture *build_stats_texture(SDL_Renderer *ren, ClientState *C)
     size_t count = (size_t)C->stats_w * (size_t)C->stats_h;
     float *prob = (float*)malloc(count * sizeof(float));
     float *avg = (float*)malloc(count * sizeof(float));
+    uint8_t *obs = NULL;
     if (!prob || !avg) {
         if (prob) free(prob);
         if (avg) free(avg);
@@ -59,6 +63,13 @@ SDL_Texture *build_stats_texture(SDL_Renderer *ren, ClientState *C)
     int grid_w = C->stats_w;
     int grid_h = C->stats_h;
     int show_avg = C->show_avg_steps;
+    if (C->have_obstacles && C->obstacles &&
+        C->obs_w == C->stats_w && C->obs_h == C->stats_h) {
+        obs = (uint8_t*)malloc(count * sizeof(uint8_t));
+        if (obs) {
+            memcpy(obs, C->obstacles, count * sizeof(uint8_t));
+        }
+    }
     pthread_mutex_unlock(&C->stats_mtx);
 
     SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888,
@@ -121,8 +132,22 @@ SDL_Texture *build_stats_texture(SDL_Renderer *ren, ClientState *C)
         }
     }
 
+    if (obs) {
+        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        for (int oy = 0; oy < grid_h; oy++) {
+            for (int ox = 0; ox < grid_w; ox++) {
+                size_t idx = (size_t)oy * (size_t)grid_w + (size_t)ox;
+                if (!obs[idx]) continue;
+                int sx, sy;
+                world_to_screen(C, ox, oy, &sx, &sy);
+                draw_big_point(ren, sx, sy, 2);
+            }
+        }
+    }
+
     SDL_SetRenderTarget(ren, NULL);
     free(prob);
     free(avg);
+    free(obs);
     return tex;
 }

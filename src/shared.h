@@ -11,6 +11,7 @@ typedef enum {
     MSG_STOP    = 5,
     MSG_ERROR   = 6,
     MSG_STATS   = 7,
+    MSG_OBSTACLES = 8,
 } MsgType;
 
 typedef enum {
@@ -53,4 +54,9 @@ typedef struct {
     uint32_t world_w;
     uint32_t world_h;
 } MsgStatsHdr;
+
+typedef struct {
+    uint32_t world_w;
+    uint32_t world_h;
+} MsgObstaclesHdr;
 #pragma pack(pop)

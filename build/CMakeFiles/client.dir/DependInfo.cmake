@@ -10,7 +10,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/client.c" "CMakeFiles/client.dir/src/client.c.o" "gcc" "CMakeFiles/client.dir/src/client.c.o.d"
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.c" "CMakeFiles/client.dir/src/client_fifo.c.o" "gcc" "CMakeFiles/client.dir/src/client_fifo.c.o.d"
-  "/home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.c" "CMakeFiles/client.dir/src/client_lifecycle.c.o" "gcc" "CMakeFiles/client.dir/src/client_lifecycle.c.o.d"
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.c" "CMakeFiles/client.dir/src/client_menu.c.o" "gcc" "CMakeFiles/client.dir/src/client_menu.c.o.d"
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.c" "CMakeFiles/client.dir/src/client_net.c.o" "gcc" "CMakeFiles/client.dir/src/client_net.c.o.d"
   "/home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.c" "CMakeFiles/client.dir/src/client_render.c.o" "gcc" "CMakeFiles/client.dir/src/client_render.c.o.d"

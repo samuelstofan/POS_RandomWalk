@@ -11,7 +11,6 @@ client: \
   CMakeFiles/client.dir/src/client_render.c.o \
   CMakeFiles/client.dir/src/client_stats.c.o \
   CMakeFiles/client.dir/src/client_spawn.c.o \
-  CMakeFiles/client.dir/src/client_lifecycle.c.o \
   CMakeFiles/client.dir/src/protocol.c.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libSDL2_ttf.so \
@@ -84,8 +83,6 @@ CMakeFiles/client.dir/src/client_render.c.o:
 CMakeFiles/client.dir/src/client_stats.c.o:
 
 CMakeFiles/client.dir/src/client_spawn.c.o:
-
-CMakeFiles/client.dir/src/client_lifecycle.c.o:
 
 CMakeFiles/client.dir/src/protocol.c.o:
 

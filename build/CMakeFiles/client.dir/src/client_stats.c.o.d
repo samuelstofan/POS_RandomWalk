@@ -207,4 +207,5 @@ CMakeFiles/client.dir/src/client_stats.c.o: \
  /usr/include/SDL2/SDL_system.h /usr/include/SDL2/SDL_timer.h \
  /usr/include/SDL2/SDL_version.h /usr/include/SDL2/SDL_locale.h \
  /usr/include/SDL2/SDL_misc.h /usr/include/SDL2/SDL_ttf.h \
- /usr/include/SDL2/SDL.h
+ /usr/include/SDL2/SDL.h \
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.h

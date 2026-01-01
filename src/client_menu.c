@@ -47,6 +47,9 @@ int run_new_sim_menu(NewSimConfig *cfg)
 
     char w_buf[32] = "51";
     char h_buf[32] = "51";
+    char obs_mode_buf[32] = "0";
+    char obs_density_buf[32] = "0.20";
+    char obs_file_buf[256] = "";
     char rep_buf[32] = "100";
     char k_buf[32] = "100";
     char pu_buf[32] = "0.25";
@@ -58,17 +61,20 @@ int run_new_sim_menu(NewSimConfig *cfg)
     snprintf(sock_buf, sizeof(sock_buf), "%s", MENU_DEFAULT_SOCK);
     snprintf(out_buf, sizeof(out_buf), "replication_results.csv");
 
-    InputField fields[10];
+    InputField fields[13];
     fields[0] = (InputField){ "Socket:", sock_buf, sizeof(sock_buf), {0}, 0, 0 };
     fields[1] = (InputField){ "World width:", w_buf, sizeof(w_buf), {0}, 1, 0 };
     fields[2] = (InputField){ "World height:", h_buf, sizeof(h_buf), {0}, 1, 0 };
-    fields[3] = (InputField){ "Replications:", rep_buf, sizeof(rep_buf), {0}, 1, 0 };
-    fields[4] = (InputField){ "K (max steps):", k_buf, sizeof(k_buf), {0}, 1, 0 };
-    fields[5] = (InputField){ "pU:", pu_buf, sizeof(pu_buf), {0}, 1, 1 };
-    fields[6] = (InputField){ "pD:", pd_buf, sizeof(pd_buf), {0}, 1, 1 };
-    fields[7] = (InputField){ "pL:", pl_buf, sizeof(pl_buf), {0}, 1, 1 };
-    fields[8] = (InputField){ "pR:", pr_buf, sizeof(pr_buf), {0}, 1, 1 };
-    fields[9] = (InputField){ "Output file:", out_buf, sizeof(out_buf), {0}, 0, 0 };
+    fields[3] = (InputField){ "Obstacle mode (0/1/2):", obs_mode_buf, sizeof(obs_mode_buf), {0}, 1, 0 };
+    fields[4] = (InputField){ "Obstacle density:", obs_density_buf, sizeof(obs_density_buf), {0}, 1, 1 };
+    fields[5] = (InputField){ "Obstacle file:", obs_file_buf, sizeof(obs_file_buf), {0}, 0, 0 };
+    fields[6] = (InputField){ "Replications:", rep_buf, sizeof(rep_buf), {0}, 1, 0 };
+    fields[7] = (InputField){ "K (max steps):", k_buf, sizeof(k_buf), {0}, 1, 0 };
+    fields[8] = (InputField){ "pU:", pu_buf, sizeof(pu_buf), {0}, 1, 1 };
+    fields[9] = (InputField){ "pD:", pd_buf, sizeof(pd_buf), {0}, 1, 1 };
+    fields[10] = (InputField){ "pL:", pl_buf, sizeof(pl_buf), {0}, 1, 1 };
+    fields[11] = (InputField){ "pR:", pr_buf, sizeof(pr_buf), {0}, 1, 1 };
+    fields[12] = (InputField){ "Output file:", out_buf, sizeof(out_buf), {0}, 0, 0 };
 
     MenuButton buttons[2];
     buttons[0].label = "Launch";
@@ -165,7 +171,7 @@ int run_new_sim_menu(NewSimConfig *cfg)
             fields[i].rect.h = row_h;
         }
 
-        int btn_y = fields[9].rect.y + row_h + 2 * gap;
+        int btn_y = fields[(int)(sizeof(fields) / sizeof(fields[0])) - 1].rect.y + row_h + 2 * gap;
         int btn_w = 220;
         buttons[0].rect.x = start_x + content_w - 2 * btn_w - gap;
         buttons[0].rect.y = btn_y;
@@ -222,9 +228,10 @@ int run_new_sim_menu(NewSimConfig *cfg)
         SDL_RenderPresent(ren);
 
         if (!running && accepted) {
-            int w = 0, h = 0, rep = 0, k = 0;
-            float pU = 0.0f, pD = 0.0f, pL = 0.0f, pR = 0.0f;
+            int w = 0, h = 0, rep = 0, k = 0, obs_mode = 0;
+            float pU = 0.0f, pD = 0.0f, pL = 0.0f, pR = 0.0f, obs_density = 0.0f;
             if (!parse_int(w_buf, &w) || !parse_int(h_buf, &h) ||
+                !parse_int(obs_mode_buf, &obs_mode) || !parse_float(obs_density_buf, &obs_density) ||
                 !parse_int(rep_buf, &rep) || !parse_int(k_buf, &k) ||
                 !parse_float(pu_buf, &pU) || !parse_float(pd_buf, &pD) ||
                 !parse_float(pl_buf, &pL) || !parse_float(pr_buf, &pR)) {
@@ -234,8 +241,17 @@ int run_new_sim_menu(NewSimConfig *cfg)
                 continue;
             }
             float sum = pU + pD + pL + pR;
-            if (w <= 2 || h <= 2 || rep <= 0 || k <= 0 || sum < 0.999f || sum > 1.001f) {
+            if (w <= 2 || h <= 2 || rep <= 0 || k <= 0 ||
+                obs_mode < 0 || obs_mode > 2 ||
+                obs_density < 0.0f || obs_density > 0.8f ||
+                sum < 0.999f || sum > 1.001f) {
                 snprintf(error_msg, sizeof(error_msg), "Invalid values (sum p* = 1).");
+                running = 1;
+                accepted = 0;
+                continue;
+            }
+            if (obs_mode == 2 && obs_file_buf[0] == '\0') {
+                snprintf(error_msg, sizeof(error_msg), "Missing obstacle file.");
                 running = 1;
                 accepted = 0;
                 continue;
@@ -254,6 +270,9 @@ int run_new_sim_menu(NewSimConfig *cfg)
             }
             cfg->world_w = w;
             cfg->world_h = h;
+            cfg->obstacle_mode = obs_mode;
+            cfg->obstacle_density = obs_density;
+            cfg->obstacle_seed = 0;
             cfg->replications = rep;
             cfg->max_steps = k;
             cfg->pU = pU;
@@ -261,6 +280,8 @@ int run_new_sim_menu(NewSimConfig *cfg)
             cfg->pL = pL;
             cfg->pR = pR;
             snprintf(cfg->sock_path, sizeof(cfg->sock_path), "%s", sock_buf);
+            strncpy(cfg->obstacle_file, obs_file_buf, sizeof(cfg->obstacle_file) - 1);
+            cfg->obstacle_file[sizeof(cfg->obstacle_file) - 1] = '\0';
             strncpy(cfg->output_path, out_buf, sizeof(cfg->output_path) - 1);
             cfg->output_path[sizeof(cfg->output_path) - 1] = '\0';
         }
@@ -864,6 +885,7 @@ void client_shutdown(ClientState *C, int sockfd, pthread_t net_th,
         free(C->avg_steps_to_center);
         free(C->base_prob);
         free(C->base_avg);
+        free(C->obstacles);
         if (C->stats_tex) SDL_DestroyTexture(C->stats_tex);
     }
     if (canvas) SDL_DestroyTexture(canvas);

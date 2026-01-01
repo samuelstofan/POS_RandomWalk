@@ -190,30 +190,6 @@ src/client_fifo.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_fifo.c.s
 .PHONY : src/client_fifo.c.s
 
-src/client_lifecycle.o: src/client_lifecycle.c.o
-.PHONY : src/client_lifecycle.o
-
-# target to build an object file
-src/client_lifecycle.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.o
-.PHONY : src/client_lifecycle.c.o
-
-src/client_lifecycle.i: src/client_lifecycle.c.i
-.PHONY : src/client_lifecycle.i
-
-# target to preprocess a source file
-src/client_lifecycle.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.i
-.PHONY : src/client_lifecycle.c.i
-
-src/client_lifecycle.s: src/client_lifecycle.c.s
-.PHONY : src/client_lifecycle.s
-
-# target to generate assembly for a file
-src/client_lifecycle.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client_lifecycle.c.s
-.PHONY : src/client_lifecycle.c.s
-
 src/client_menu.o: src/client_menu.c.o
 .PHONY : src/client_menu.o
 
@@ -497,9 +473,6 @@ help:
 	@echo "... src/client_fifo.o"
 	@echo "... src/client_fifo.i"
 	@echo "... src/client_fifo.s"
-	@echo "... src/client_lifecycle.o"
-	@echo "... src/client_lifecycle.i"
-	@echo "... src/client_lifecycle.s"
 	@echo "... src/client_menu.o"
 	@echo "... src/client_menu.i"
 	@echo "... src/client_menu.s"

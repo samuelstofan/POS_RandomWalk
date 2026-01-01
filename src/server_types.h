@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdatomic.h>
 #include <pthread.h>
+#include <stdint.h>
 
 #include "shared.h"
 
@@ -23,6 +24,11 @@ typedef struct {
     int **succesful_replications;
     float **prob_to_center;
     float **avg_steps_to_center;
+    uint8_t *obstacles;
+    int obstacle_mode;
+    float obstacle_density;
+    uint32_t obstacle_seed;
+    char obstacle_file[256];
 
     atomic_uint mode;
 

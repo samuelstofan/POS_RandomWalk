@@ -214,10 +214,9 @@ CMakeFiles/client.dir/src/client.c.o: \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_ui.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_menu.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_replay.h \
- /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_spawn.h \
+ /home/samuel/Plocha/POS/POS_RandomWalk/src/client_net.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_fifo.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_render.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/client_stats.h \
- /home/samuel/Plocha/POS/POS_RandomWalk/src/client_lifecycle.h \
  /home/samuel/Plocha/POS/POS_RandomWalk/src/shared.h

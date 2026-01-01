@@ -9,15 +9,24 @@
 
 static float get_random(void) { return (float)rand() / (float)RAND_MAX; }
 
+static int is_obstacle(const Server *S, int x, int y) {
+    if (!S->obstacles) return 0;
+    size_t idx = (size_t)y * (size_t)S->world_w + (size_t)x;
+    return S->obstacles[idx] != 0;
+}
+
 static void write_results(Server *S) {
     if (!S->results_fp) return;
 
     int reps = atomic_load(&S->current_replication);
     if (reps <= 0) return;
 
-    fprintf(S->results_fp, "%d,%d,%.6f,%.6f,%.6f,%.6f,%d,%d,%s\n",
+    const char *ob_file = (S->obstacle_file[0] != '\0') ? S->obstacle_file : "-";
+    fprintf(S->results_fp, "%d,%d,%.6f,%.6f,%.6f,%.6f,%d,%d,%d,%.6f,%u,%s,%s\n",
             S->world_w, S->world_h, S->pU, S->pD, S->pL, S->pR,
-            S->max_steps, S->base_replications + reps, S->sock_path);
+            S->max_steps, S->base_replications + reps,
+            S->obstacle_mode, S->obstacle_density, S->obstacle_seed,
+            ob_file, S->sock_path);
 
     for (int y = 0; y < S->world_h; y++) {
         for (int x = 0; x < S->world_w; x++) {
@@ -77,6 +86,7 @@ void *sim_thread(void *arg) {
         for (int x_spawn = 0; x_spawn < S->world_w && atomic_load(&S->running); x_spawn++) {
             for (int y_spawn = 0; y_spawn < S->world_h && atomic_load(&S->running); y_spawn++) {
                 if (x_spawn == center_x && y_spawn == center_y) continue;
+                if (is_obstacle(S, x_spawn, y_spawn)) continue;
 
                 atomic_store(&S->current_replication, rep + 1);
                 MsgProgress p = {
@@ -107,10 +117,14 @@ void *sim_thread(void *arg) {
                     else if (r < S->pU + S->pD + S->pL) dx = -1;
                     else dx = +1;
 
-                    x = (x + dx) % S->world_w;
-                    y = (y + dy) % S->world_h;
-                    if (x < 0) x += S->world_w;
-                    if (y < 0) y += S->world_h;
+                    int nx = (x + dx) % S->world_w;
+                    int ny = (y + dy) % S->world_h;
+                    if (nx < 0) nx += S->world_w;
+                    if (ny < 0) ny += S->world_h;
+                    if (!is_obstacle(S, nx, ny)) {
+                        x = nx;
+                        y = ny;
+                    }
 
                     atomic_store(&S->current_step, step + 1);
 

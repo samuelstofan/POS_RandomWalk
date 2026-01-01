@@ -6,8 +6,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/client.dir/src/client.c.o.d"
   "CMakeFiles/client.dir/src/client_fifo.c.o"
   "CMakeFiles/client.dir/src/client_fifo.c.o.d"
-  "CMakeFiles/client.dir/src/client_lifecycle.c.o"
-  "CMakeFiles/client.dir/src/client_lifecycle.c.o.d"
   "CMakeFiles/client.dir/src/client_menu.c.o"
   "CMakeFiles/client.dir/src/client_menu.c.o.d"
   "CMakeFiles/client.dir/src/client_net.c.o"

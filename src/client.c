@@ -23,6 +23,34 @@
 #include "client_stats.h"
 #include "shared.h"
 
+static void draw_obstacles_once(ClientState *C, SDL_Renderer *ren, SDL_Texture *canvas)
+{
+    if (!C || !ren || !canvas) return;
+    if (!C->have_obstacles || C->obstacles_drawn) return;
+
+    pthread_mutex_lock(&C->stats_mtx);
+    if (!C->have_obstacles || !C->obstacles ||
+        C->obs_w != C->world_w || C->obs_h != C->world_h) {
+        pthread_mutex_unlock(&C->stats_mtx);
+        return;
+    }
+
+    SDL_SetRenderTarget(ren, canvas);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    for (int oy = 0; oy < C->obs_h; oy++) {
+        for (int ox = 0; ox < C->obs_w; ox++) {
+            size_t idx = (size_t)oy * (size_t)C->obs_w + (size_t)ox;
+            if (!C->obstacles[idx]) continue;
+            int sx, sy;
+            world_to_screen(C, ox, oy, &sx, &sy);
+            draw_big_point(ren, sx, sy, 2);
+        }
+    }
+    SDL_SetRenderTarget(ren, NULL);
+    C->obstacles_drawn = 1;
+    pthread_mutex_unlock(&C->stats_mtx);
+}
+
 int main(int argc, char **argv) {
     // 1) create new sim (spawns server): client --new /tmp/rwalk.sock
     // 2) join existing sim:           client --join /tmp/rwalk.sock
@@ -34,6 +62,10 @@ int main(int argc, char **argv) {
         char new_sock[256];
 
         int world_w = 51, world_h = 51;
+        int obstacle_mode = 0;
+        float obstacle_density = 0.0f;
+        uint32_t obstacle_seed = 0;
+        char obstacle_file[256] = "";
         int delay_ms = 10;
         int replications = 100;
         int max_steps    = 100;
@@ -59,13 +91,18 @@ int main(int argc, char **argv) {
                     if (!run_replay_menu(&rcfg)) {
                         continue;
                     }
-                int file_w = 0, file_h = 0, file_k = 0, file_reps = 0;
+                int file_w = 0, file_h = 0, file_k = 0, file_reps = 0, file_obstacles = 0;
+                float file_ob_density = 0.0f;
+                uint32_t file_ob_seed = 0;
+                char file_ob_file[256] = "";
                 float file_pU = 0.0f, file_pD = 0.0f, file_pL = 0.0f, file_pR = 0.0f;
                 float *file_prob = NULL;
                 float *file_avg = NULL;
                 if (!load_replay_file(rcfg.input_path, &file_w, &file_h, &file_k,
                                       &file_pU, &file_pD, &file_pL, &file_pR,
-                                      &file_reps, new_sock, sizeof(new_sock),
+                                      &file_reps, &file_obstacles, &file_ob_density,
+                                      &file_ob_seed, file_ob_file, sizeof(file_ob_file),
+                                      new_sock, sizeof(new_sock),
                                       &file_prob, &file_avg)) {
                     fprintf(stderr, "Replay: failed to load %s\n", rcfg.input_path);
                     continue;
@@ -78,6 +115,15 @@ int main(int argc, char **argv) {
                     pL = file_pL;
                     pR = file_pR;
                     replications = rcfg.replications;
+                    obstacle_mode = file_obstacles;
+                    obstacle_density = file_ob_density;
+                    obstacle_seed = file_ob_seed;
+                    if (file_ob_file[0]) {
+                        strncpy(obstacle_file, file_ob_file, sizeof(obstacle_file) - 1);
+                        obstacle_file[sizeof(obstacle_file) - 1] = '\0';
+                    } else {
+                        obstacle_file[0] = '\0';
+                    }
                     strncpy(output_path, rcfg.output_path, sizeof(output_path) - 1);
                     output_path[sizeof(output_path) - 1] = '\0';
                 if (new_sock[0] == '\0') {
@@ -106,6 +152,11 @@ int main(int argc, char **argv) {
                     pD = cfg.pD;
                     pL = cfg.pL;
                     pR = cfg.pR;
+                    obstacle_mode = cfg.obstacle_mode;
+                    obstacle_density = cfg.obstacle_density;
+                    obstacle_seed = cfg.obstacle_seed;
+                    strncpy(obstacle_file, cfg.obstacle_file, sizeof(obstacle_file) - 1);
+                    obstacle_file[sizeof(obstacle_file) - 1] = '\0';
                 copy_path(new_sock, sizeof(new_sock), cfg.sock_path);
                     strncpy(output_path, cfg.output_path, sizeof(output_path) - 1);
                     output_path[sizeof(output_path) - 1] = '\0';
@@ -136,7 +187,8 @@ int main(int argc, char **argv) {
 
     if (strcmp(mode, "--new") == 0) {
         if (spawn_server(server_bin, sock_path, world_w, world_h, delay_ms, replications, max_steps,
-                         pU, pD, pL, pR, output_path, replay_replications) != 0) {
+                         pU, pD, pL, pR, output_path, replay_replications,
+                         obstacle_mode, obstacle_density, obstacle_seed, obstacle_file) != 0) {
             perror("spawn_server");
             free(replay_prob);
             free(replay_avg);
@@ -205,6 +257,10 @@ int main(int argc, char **argv) {
     C.base_w = C.base_h = 0;
     C.base_replications = 0;
     C.have_base_stats = 0;
+    C.obstacles = NULL;
+    C.obs_w = C.obs_h = 0;
+    C.have_obstacles = 0;
+    C.obstacles_drawn = 0;
     if (font_path) {
         strncpy(C.font_path, font_path, sizeof(C.font_path) - 1);
         C.font_path[sizeof(C.font_path) - 1] = '\0';
@@ -334,6 +390,7 @@ int main(int argc, char **argv) {
                         C.stats_tex = NULL;
                     }
                     C.stats_dirty = 1;
+                    C.obstacles_drawn = 0;
                 }
             }
             if (e.type == SDL_KEYDOWN) {
@@ -373,6 +430,7 @@ int main(int argc, char **argv) {
 
                     have_prev = 0;
                     start_point_drawn = 0;
+                    C.obstacles_drawn = 0;
 
                 }
                 if (e.key.keysym.sym == SDLK_q) {
@@ -412,6 +470,7 @@ int main(int argc, char **argv) {
                     SDL_SetRenderTarget(ren, NULL);
                     have_prev = 0;
                     start_point_drawn = 0;
+                    C.obstacles_drawn = 0;
                 }
                 last_step_index = st.step_index;
 
@@ -430,7 +489,7 @@ int main(int argc, char **argv) {
                         draw_big_point(ren, sx, sy, 4);
 
                         int cx, cy;
-                        world_to_screen(&C, world_h/2, world_h/2, &cx, &cy);
+                        world_to_screen(&C, C.world_w/2, C.world_h/2, &cx, &cy);
                         SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
                         draw_big_point(ren, cx, cy, 4);
 
@@ -459,6 +518,8 @@ int main(int argc, char **argv) {
             SDL_RenderClear(ren);
 
             SDL_RenderCopy(ren, canvas, NULL, NULL);
+
+            draw_obstacles_once(&C, ren, canvas);
 
             if (have_prev) {
                 int sx, sy;
