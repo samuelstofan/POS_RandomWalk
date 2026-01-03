@@ -135,7 +135,6 @@ static void *client_reader_thread(void *arg) {
         if (h.type == MSG_STOP && h.len == 0) {
             fprintf(stderr, "Server: STOP received\n");
             atomic_store(&S->running, 0);
-            atomic_store(&S->waiting_before_shutdown, 0);
             break;
         }
 

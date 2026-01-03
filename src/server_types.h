@@ -47,7 +47,6 @@ typedef struct {
 
     atomic_int running;
     atomic_int sim_started;
-    atomic_int waiting_before_shutdown;
     atomic_int active_clients;
     pthread_t accept_th, sim_th;
 } Server;

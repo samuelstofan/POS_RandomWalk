@@ -1,4 +1,6 @@
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -16,9 +18,6 @@
 #include "server_net.h"
 #include "server_sim.h"
 
-static volatile sig_atomic_t g_stop = 0;
-
-static void on_sigint(int sig) { (void)sig; g_stop = 1; }
 
 static int check_connectivity(int w, int h, const uint8_t *obs) {
     if (!obs) return 1;
@@ -277,11 +276,18 @@ int main(int argc, char **argv) {
     atomic_store(&S.current_step, 0);
     atomic_store(&S.running, 1);
     atomic_store(&S.sim_started, 0);
-    atomic_store(&S.waiting_before_shutdown, 0);
     atomic_store(&S.active_clients, 0);
 
-    signal(SIGINT, on_sigint);
-    signal(SIGTERM, on_sigint);
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGINT);
+    sigaddset(&sigset, SIGTERM);
+    int mask_rc = pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+    if (mask_rc != 0) {
+        fprintf(stderr, "pthread_sigmask: %s\n", strerror(mask_rc));
+        fclose(S.results_fp);
+        return 1;
+    }
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
 
@@ -346,10 +352,21 @@ int main(int argc, char **argv) {
     fflush(stdout);
 
     pthread_create(&S.accept_th, NULL, accept_thread, &S);
+    int expected = 0;
+    if (atomic_compare_exchange_strong(&S.sim_started, &expected, 1)) {
+        if (atomic_load(&S.active_clients) == 0) {
+            atomic_store(&S.mode, MODE_SUMMARY);
+        }
+        pthread_create(&S.sim_th, NULL, sim_thread, &S);
+    }
 
-    while (!g_stop && atomic_load(&S.running)) {
-        sleep(1);
-        atomic_store(&S.waiting_before_shutdown, 1);
+    int stop_requested = 0;
+    while (!stop_requested && atomic_load(&S.running)) {
+        struct timespec ts = { .tv_sec = 1, .tv_nsec = 0 };
+        int sig = sigtimedwait(&sigset, NULL, &ts);
+        if (sig == SIGINT || sig == SIGTERM) {
+            stop_requested = 1;
+        }
     }
 
     while (atomic_load(&S.active_clients) > 0) {
@@ -384,7 +401,8 @@ int main(int argc, char **argv) {
         free(S.obstacles);
     }
     free(S.history);
-
+    fprintf(stdout, "SERVER SHUTDOWN COMPLETE.\n");
+    fflush(stdout);
     fclose(S.results_fp);
     return 0;
 }

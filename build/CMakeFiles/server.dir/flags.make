@@ -6,5 +6,5 @@ C_DEFINES =
 
 C_INCLUDES = -I/home/samuel/Plocha/POS/POS_RandomWalk/src -I/usr/include/SDL2 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -I/usr/include/sysprof-6
 
-C_FLAGS = -std=gnu11 -D_GNU_SOURCE=1 -D_REENTRANT -DWITH_GZFILEOP -pthread
+C_FLAGS = -Wall -Wextra -Werror -Wunused-function -Wunused-parameter -std=gnu11 -D_GNU_SOURCE=1 -D_REENTRANT -DWITH_GZFILEOP -pthread
 
