@@ -52,14 +52,13 @@ static void draw_obstacles_once(ClientState *C, SDL_Renderer *ren, SDL_Texture *
 }
 
 int main(int argc, char **argv) {
-    // 1) create new sim (spawns server): client --new /tmp/rwalk.sock
-    // 2) join existing sim:           client --join /tmp/rwalk.sock
     int force_menu = 0;
     for (;;) {
         const char *mode = NULL;
         const char *sock_path = NULL;
         char join_sock[256];
         char new_sock[256];
+        int start_on_client = 0;
 
         int world_w = 51, world_h = 51;
         int obstacle_mode = 0;
@@ -83,6 +82,7 @@ int main(int argc, char **argv) {
         int restart_to_menu = 0;
 
         if (argc < 3 || force_menu) {
+            start_on_client = 1;
             while (1) {
                 MenuAction act = run_main_menu();
                 if (act == MENU_ACT_EXIT) return 0;
@@ -185,10 +185,12 @@ int main(int argc, char **argv) {
     uint32_t last_step_index = 0;
 
 
-    if (strcmp(mode, "--new") == 0) {
+    int spawned_server = (strcmp(mode, "--new") == 0);
+    if (spawned_server) {
         if (spawn_server(server_bin, sock_path, world_w, world_h, delay_ms, replications, max_steps,
                          pU, pD, pL, pR, output_path, replay_replications,
-                         obstacle_mode, obstacle_density, obstacle_seed, obstacle_file) != 0) {
+                         obstacle_mode, obstacle_density, obstacle_seed, obstacle_file,
+                         start_on_client) != 0) {
             perror("spawn_server");
             free(replay_prob);
             free(replay_avg);
@@ -207,6 +209,9 @@ int main(int argc, char **argv) {
         free(replay_prob);
         free(replay_avg);
         return 1;
+    }
+    if (spawned_server) {
+        send_mode(fd, MODE_INTERACTIVE);
     }
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {

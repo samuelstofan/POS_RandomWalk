@@ -186,7 +186,7 @@ static int init_obstacles(Server *S) {
 int main(int argc, char **argv) {
     if (argc < 11) {
         fprintf(stderr,
-            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR> [output_file] [base_replications] [obstacle_mode] [obstacle_density] [obstacle_seed] [obstacle_file]\n"
+            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR> [output_file] [base_replications] [obstacle_mode] [obstacle_density] [obstacle_seed] [obstacle_file] [start_on_client]\n"
             "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25 results.csv 50 1 0.2 12345\n",
             argv[0], argv[0]);
         return 2;
@@ -220,6 +220,7 @@ int main(int argc, char **argv) {
     } else {
         S.obstacle_file[0] = '\0';
     }
+    int start_on_client = (argc >= 18) ? atoi(argv[17]) : 0;
     if (S.obstacle_mode != 2) {
         S.obstacle_file[0] = '\0';
     }
@@ -352,12 +353,14 @@ int main(int argc, char **argv) {
     fflush(stdout);
 
     pthread_create(&S.accept_th, NULL, accept_thread, &S);
-    int expected = 0;
-    if (atomic_compare_exchange_strong(&S.sim_started, &expected, 1)) {
-        if (atomic_load(&S.active_clients) == 0) {
-            atomic_store(&S.mode, MODE_SUMMARY);
+    if (!start_on_client) {
+        int expected = 0;
+        if (atomic_compare_exchange_strong(&S.sim_started, &expected, 1)) {
+            if (atomic_load(&S.active_clients) == 0) {
+                atomic_store(&S.mode, MODE_SUMMARY);
+            }
+            pthread_create(&S.sim_th, NULL, sim_thread, &S);
         }
-        pthread_create(&S.sim_th, NULL, sim_thread, &S);
     }
 
     int stop_requested = 0;
