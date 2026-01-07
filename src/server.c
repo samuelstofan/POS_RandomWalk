@@ -19,7 +19,7 @@
 #include "server_sim.h"
 
 
-static int check_connectivity(int w, int h, const uint8_t *obs) {
+static int check_reachability(int w, int h, const uint8_t *obs) {
     if (!obs) return 1;
     int cx = w / 2;
     int cy = h / 2;
@@ -68,13 +68,8 @@ static int check_connectivity(int w, int h, const uint8_t *obs) {
     return reachable == free_cells;
 }
 
-static uint32_t next_rand(uint32_t *state) {
-    *state = (*state * 1664525u) + 1013904223u;
-    return *state;
-}
-
-static float rand_float(uint32_t *state) {
-    return (float)(next_rand(state) & 0xFFFFFFu) / (float)0x1000000u;
+static float rand_float(void) {
+    return (float)rand() / (float)RAND_MAX;
 }
 
 static int load_obstacles_file(const char *path, int w, int h, uint8_t **out_obs) {
@@ -121,10 +116,6 @@ static int generate_random_obstacles(Server *S) {
     S->obstacles = (uint8_t*)calloc(count, sizeof(uint8_t));
     if (!S->obstacles) return 0;
 
-    uint32_t seed = S->obstacle_seed;
-    if (seed == 0) seed = (uint32_t)time(NULL);
-    uint32_t start_seed = seed;
-
     float density = S->obstacle_density;
     if (density < 0.0f) density = 0.0f;
     if (density > 0.8f) density = 0.8f;
@@ -137,14 +128,13 @@ static int generate_random_obstacles(Server *S) {
         for (int y = 0; y < S->world_h; y++) {
             for (int x = 0; x < S->world_w; x++) {
                 if ((x == 0 && y == 0) || (x == cx && y == cy)) continue;
-                if (rand_float(&seed) < density) {
+                if (rand_float() < density) {
                     size_t idx = (size_t)y * (size_t)S->world_w + (size_t)x;
                     S->obstacles[idx] = 1;
                 }
             }
         }
-        if (check_connectivity(S->world_w, S->world_h, S->obstacles)) {
-            S->obstacle_seed = start_seed;
+        if (check_reachability(S->world_w, S->world_h, S->obstacles)) {
             return 1;
         }
     }
@@ -169,14 +159,13 @@ static int init_obstacles(Server *S) {
             free(obs);
             return 0;
         }
-        if (!check_connectivity(S->world_w, S->world_h, obs)) {
+        if (!check_reachability(S->world_w, S->world_h, obs)) {
             fprintf(stderr, "Obstacle world is not fully reachable from [0,0].\n");
             free(obs);
             return 0;
         }
         S->obstacles = obs;
         S->obstacle_density = 0.0f;
-        S->obstacle_seed = 0;
         return 1;
     }
 
@@ -186,8 +175,8 @@ static int init_obstacles(Server *S) {
 int main(int argc, char **argv) {
     if (argc < 11) {
         fprintf(stderr,
-            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR> [output_file] [base_replications] [obstacle_mode] [obstacle_density] [obstacle_seed] [obstacle_file] [start_on_client]\n"
-            "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25 results.csv 50 1 0.2 12345\n",
+            "Usage: %s <sock_path> <world_w> <world_h> <delay_ms> <replications> <max_steps> <pU> <pD> <pL> <pR> [output_file] [base_replications] [obstacle_mode] [obstacle_density] [obstacle_file] [start_on_client]\n"
+            "Example: %s /tmp/rwalk.sock 101 101 10 5 100 0.25 0.25 0.25 0.25 results.csv 50 1 0.2\n",
             argv[0], argv[0]);
         return 2;
     }
@@ -213,20 +202,18 @@ int main(int argc, char **argv) {
     S.base_replications = (argc >= 13) ? atoi(argv[12]) : 0;
     S.obstacle_mode = (argc >= 14) ? atoi(argv[13]) : 0;
     S.obstacle_density = (argc >= 15) ? strtof(argv[14], NULL) : 0.0f;
-    S.obstacle_seed = (argc >= 16) ? (uint32_t)strtoul(argv[15], NULL, 10) : 0;
-    if (argc >= 17) {
-        strncpy(S.obstacle_file, argv[16], sizeof(S.obstacle_file) - 1);
+    if (argc >= 16) {
+        strncpy(S.obstacle_file, argv[15], sizeof(S.obstacle_file) - 1);
         S.obstacle_file[sizeof(S.obstacle_file) - 1] = '\0';
     } else {
         S.obstacle_file[0] = '\0';
     }
-    int start_on_client = (argc >= 18) ? atoi(argv[17]) : 0;
+    int start_on_client = (argc >= 17) ? atoi(argv[16]) : 0;
     if (S.obstacle_mode != 2) {
         S.obstacle_file[0] = '\0';
     }
     if (S.obstacle_mode == 0) {
         S.obstacle_density = 0.0f;
-        S.obstacle_seed = 0;
     }
     if (S.base_replications < 0) S.base_replications = 0;
 

@@ -16,7 +16,7 @@ static int token_is_number(const char *s) {
 int load_replay_file(const char *path, int *out_w, int *out_h, int *out_max_steps,
                      float *out_pU, float *out_pD, float *out_pL, float *out_pR,
                      int *out_replications, int *out_obstacle_mode,
-                     float *out_obstacle_density, uint32_t *out_obstacle_seed,
+                     float *out_obstacle_density,
                      char *out_obstacle_file, size_t out_obstacle_file_cap,
                      char *out_sock, size_t out_sock_cap,
                      float **out_prob, float **out_avg)
@@ -24,7 +24,7 @@ int load_replay_file(const char *path, int *out_w, int *out_h, int *out_max_step
     if (!path || !out_w || !out_h || !out_max_steps ||
         !out_pU || !out_pD || !out_pL || !out_pR ||
         !out_replications || !out_obstacle_mode || !out_obstacle_density ||
-        !out_obstacle_seed || !out_obstacle_file || out_obstacle_file_cap == 0 ||
+        !out_obstacle_file || out_obstacle_file_cap == 0 ||
         !out_sock || out_sock_cap == 0 ||
         !out_prob || !out_avg) {
         return 0;
@@ -41,7 +41,6 @@ int load_replay_file(const char *path, int *out_w, int *out_h, int *out_max_step
 
     int w = 0, h = 0, k = 0, reps = 0, obstacles = 0;
     float ob_density = 0.0f;
-    uint32_t ob_seed = 0;
     char ob_file[256] = {0};
     char sock_buf[256] = {0};
     float pU = 0.0f, pD = 0.0f, pL = 0.0f, pR = 0.0f;
@@ -89,7 +88,6 @@ int load_replay_file(const char *path, int *out_w, int *out_h, int *out_max_step
         ob_density = strtof(tokens[next], NULL);
         next++;
         if (token_count > next && token_is_number(tokens[next])) {
-            ob_seed = (uint32_t)strtoul(tokens[next], NULL, 10);
             next++;
         }
         if (token_count > next) {
@@ -140,7 +138,6 @@ int load_replay_file(const char *path, int *out_w, int *out_h, int *out_max_step
     *out_replications = reps;
     *out_obstacle_mode = obstacles;
     *out_obstacle_density = ob_density;
-    *out_obstacle_seed = ob_seed;
     if (strcmp(ob_file, "-") != 0 && ob_file[0] != '\0') {
         copy_path(out_obstacle_file, out_obstacle_file_cap, ob_file);
     } else {

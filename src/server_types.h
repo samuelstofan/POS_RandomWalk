@@ -27,7 +27,6 @@ typedef struct {
     uint8_t *obstacles;
     int obstacle_mode;
     float obstacle_density;
-    uint32_t obstacle_seed;
     char obstacle_file[256];
 
     atomic_uint mode;

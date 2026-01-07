@@ -272,7 +272,6 @@ int run_new_sim_menu(NewSimConfig *cfg)
             cfg->world_h = h;
             cfg->obstacle_mode = obs_mode;
             cfg->obstacle_density = obs_density;
-            cfg->obstacle_seed = 0;
             cfg->replications = rep;
             cfg->max_steps = k;
             cfg->pU = pU;
@@ -502,7 +501,7 @@ int run_replay_menu(ReplayConfig *cfg)
                 continue;
             }
             if (in_buf[0] == '\0' || out_buf[0] == '\0') {
-                snprintf(error_msg, sizeof(error_msg), "Zadaj vstupny aj vystupny subor.");
+                snprintf(error_msg, sizeof(error_msg), "Missing input or output file.");
                 running = 1;
                 accepted = 0;
                 continue;
@@ -541,7 +540,7 @@ int run_join_menu(JoinConfig *cfg)
     }
 
     int win_w = 2800, win_h = 2400;
-    SDL_Window *win = SDL_CreateWindow("Random Walk - Pripojenie",
+    SDL_Window *win = SDL_CreateWindow("Random Walk - Join",
                                        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                        win_w, win_h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (!win) {
@@ -703,7 +702,7 @@ int run_join_menu(JoinConfig *cfg)
 
         if (!running && accepted) {
             if (sock_buf[0] == '\0') {
-                snprintf(error_msg, sizeof(error_msg), "Zadaj socket.");
+                snprintf(error_msg, sizeof(error_msg), "Socket missing.");
                 running = 1;
                 accepted = 0;
                 continue;

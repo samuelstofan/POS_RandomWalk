@@ -29,7 +29,6 @@ typedef struct {
     int world_h;
     int obstacle_mode;
     float obstacle_density;
-    uint32_t obstacle_seed;
     char obstacle_file[256];
     int replications;
     int max_steps;

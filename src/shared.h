@@ -28,11 +28,11 @@ typedef struct {
 typedef struct {
     uint32_t world_w;
     uint32_t world_h;
-    uint32_t mode;      // SimMode
+    uint32_t mode;     
     uint32_t replications;
     uint32_t max_steps;
     uint32_t step_delay_ms;
-    float pU, pD, pL, pR; // sum = 1
+    float pU, pD, pL, pR;
 } MsgWelcome;
 
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
 } MsgStep;
 
 typedef struct {
-    uint32_t mode; // SimMode
+    uint32_t mode; 
 } MsgMode;
 
 typedef struct {

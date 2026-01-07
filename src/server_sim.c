@@ -22,10 +22,10 @@ static void write_results(Server *S) {
     if (reps <= 0) return;
 
     const char *ob_file = (S->obstacle_file[0] != '\0') ? S->obstacle_file : "-";
-    fprintf(S->results_fp, "%d,%d,%.6f,%.6f,%.6f,%.6f,%d,%d,%d,%.6f,%u,%s,%s\n",
+    fprintf(S->results_fp, "%d,%d,%.6f,%.6f,%.6f,%.6f,%d,%d,%d,%.6f,%s,%s\n",
             S->world_w, S->world_h, S->pU, S->pD, S->pL, S->pR,
             S->max_steps, S->base_replications + reps,
-            S->obstacle_mode, S->obstacle_density, S->obstacle_seed,
+            S->obstacle_mode, S->obstacle_density,
             ob_file, S->sock_path);
 
     for (int y = 0; y < S->world_h; y++) {

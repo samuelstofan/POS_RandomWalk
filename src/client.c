@@ -23,34 +23,6 @@
 #include "client_stats.h"
 #include "shared.h"
 
-static void draw_obstacles_once(ClientState *C, SDL_Renderer *ren, SDL_Texture *canvas)
-{
-    if (!C || !ren || !canvas) return;
-    if (!C->have_obstacles || C->obstacles_drawn) return;
-
-    pthread_mutex_lock(&C->stats_mtx);
-    if (!C->have_obstacles || !C->obstacles ||
-        C->obs_w != C->world_w || C->obs_h != C->world_h) {
-        pthread_mutex_unlock(&C->stats_mtx);
-        return;
-    }
-
-    SDL_SetRenderTarget(ren, canvas);
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    for (int oy = 0; oy < C->obs_h; oy++) {
-        for (int ox = 0; ox < C->obs_w; ox++) {
-            size_t idx = (size_t)oy * (size_t)C->obs_w + (size_t)ox;
-            if (!C->obstacles[idx]) continue;
-            int sx, sy;
-            world_to_screen(C, ox, oy, &sx, &sy);
-            draw_big_point(ren, sx, sy, 2);
-        }
-    }
-    SDL_SetRenderTarget(ren, NULL);
-    C->obstacles_drawn = 1;
-    pthread_mutex_unlock(&C->stats_mtx);
-}
-
 int main(int argc, char **argv) {
     int force_menu = 0;
     for (;;) {
@@ -63,7 +35,6 @@ int main(int argc, char **argv) {
         int world_w = 51, world_h = 51;
         int obstacle_mode = 0;
         float obstacle_density = 0.0f;
-        uint32_t obstacle_seed = 0;
         char obstacle_file[256] = "";
         int delay_ms = 10;
         int replications = 100;
@@ -93,7 +64,6 @@ int main(int argc, char **argv) {
                     }
                 int file_w = 0, file_h = 0, file_k = 0, file_reps = 0, file_obstacles = 0;
                 float file_ob_density = 0.0f;
-                uint32_t file_ob_seed = 0;
                 char file_ob_file[256] = "";
                 float file_pU = 0.0f, file_pD = 0.0f, file_pL = 0.0f, file_pR = 0.0f;
                 float *file_prob = NULL;
@@ -101,7 +71,7 @@ int main(int argc, char **argv) {
                 if (!load_replay_file(rcfg.input_path, &file_w, &file_h, &file_k,
                                       &file_pU, &file_pD, &file_pL, &file_pR,
                                       &file_reps, &file_obstacles, &file_ob_density,
-                                      &file_ob_seed, file_ob_file, sizeof(file_ob_file),
+                                      file_ob_file, sizeof(file_ob_file),
                                       new_sock, sizeof(new_sock),
                                       &file_prob, &file_avg)) {
                     fprintf(stderr, "Replay: failed to load %s\n", rcfg.input_path);
@@ -117,7 +87,6 @@ int main(int argc, char **argv) {
                     replications = rcfg.replications;
                     obstacle_mode = file_obstacles;
                     obstacle_density = file_ob_density;
-                    obstacle_seed = file_ob_seed;
                     if (file_ob_file[0]) {
                         strncpy(obstacle_file, file_ob_file, sizeof(obstacle_file) - 1);
                         obstacle_file[sizeof(obstacle_file) - 1] = '\0';
@@ -154,7 +123,6 @@ int main(int argc, char **argv) {
                     pR = cfg.pR;
                     obstacle_mode = cfg.obstacle_mode;
                     obstacle_density = cfg.obstacle_density;
-                    obstacle_seed = cfg.obstacle_seed;
                     strncpy(obstacle_file, cfg.obstacle_file, sizeof(obstacle_file) - 1);
                     obstacle_file[sizeof(obstacle_file) - 1] = '\0';
                 copy_path(new_sock, sizeof(new_sock), cfg.sock_path);
@@ -189,7 +157,7 @@ int main(int argc, char **argv) {
     if (spawned_server) {
         if (spawn_server(server_bin, sock_path, world_w, world_h, delay_ms, replications, max_steps,
                          pU, pD, pL, pR, output_path, replay_replications,
-                         obstacle_mode, obstacle_density, obstacle_seed, obstacle_file,
+                         obstacle_mode, obstacle_density, obstacle_file,
                          start_on_client) != 0) {
             perror("spawn_server");
             free(replay_prob);
@@ -524,7 +492,7 @@ int main(int argc, char **argv) {
 
             SDL_RenderCopy(ren, canvas, NULL, NULL);
 
-            draw_obstacles_once(&C, ren, canvas);
+            draw_obstacles(&C, ren, canvas);
 
             if (have_prev) {
                 int sx, sy;
