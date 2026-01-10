@@ -765,6 +765,9 @@ MenuAction run_main_menu(void)
     buttons[2].action = MENU_ACT_REPLAY;
     buttons[3].label = "Exit";
     buttons[3].action = MENU_ACT_EXIT;
+    for (int i = 0; i < 4; i++) {
+        buttons[i].rect = (SDL_Rect){0, 0, 0, 0};
+    }
 
     int selected = 0;
     int running = 1;

@@ -123,7 +123,7 @@ static int generate_random_obstacles(Server *S) {
     int cx = S->world_w / 2;
     int cy = S->world_h / 2;
 
-    for (int attempt = 0; attempt < 200; attempt++) {
+    for (int attempt = 0; attempt < 2000; attempt++) {
         memset(S->obstacles, 0, count);
         for (int y = 0; y < S->world_h; y++) {
             for (int x = 0; x < S->world_w; x++) {
@@ -138,6 +138,8 @@ static int generate_random_obstacles(Server *S) {
             return 1;
         }
     }
+    fprintf(stderr,"Faild to find world with full reachability and with obstacle density %.2f.\n",density);
+    fflush(stderr);
     free(S->obstacles);
     S->obstacles = NULL;
     return 0;
@@ -250,6 +252,8 @@ int main(int argc, char **argv) {
     }
 
     if (!init_obstacles(&S)) {
+        fprintf(stderr,"Obstacle init fail.");
+        fflush(stderr);
         fclose(S.results_fp);
         return 2;
     }

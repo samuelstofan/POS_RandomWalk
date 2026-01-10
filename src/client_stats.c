@@ -133,16 +133,7 @@ SDL_Texture *build_stats_texture(SDL_Renderer *ren, ClientState *C)
     }
 
     if (obs) {
-        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-        for (int oy = 0; oy < grid_h; oy++) {
-            for (int ox = 0; ox < grid_w; ox++) {
-                size_t idx = (size_t)oy * (size_t)grid_w + (size_t)ox;
-                if (!obs[idx]) continue;
-                int sx, sy;
-                world_to_screen(C, ox, oy, &sx, &sy);
-                draw_big_point(ren, sx, sy, 2);
-            }
-        }
+        draw_obstacles_loop(C, ren, obs, grid_w, grid_h, 5, 8);
     }
 
     SDL_SetRenderTarget(ren, NULL);
